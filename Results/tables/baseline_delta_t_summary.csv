@@ -1,0 +1,3 @@
+sheet,rows,start,end,median_temperature_separation_c,anomalies,table,figure
+Ground floor,212293,2022-01-27 15:36:34,2025-02-06 15:21:34,1.489999771118164,0,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\processed_data\baseline_delta_t_ground_floor.csv,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\figures\baseline_delta_t_ground_floor.png
+First floor,288435,2020-12-26 18:51:34,2025-02-06 15:21:34,2.239999771118164,0,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\processed_data\baseline_delta_t_first_floor.csv,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\figures\baseline_delta_t_first_floor.png

@@ -1,0 +1,28 @@
+project:
+  name: thesis-heat-detection
+  method_target: HEAT replication and extension
+
+physical_constants:
+  # Water specific heat capacity. Supervisor formula:
+  # m = Power / (Cp * (Ts - Tr))
+  water_cp_j_per_kg_c: 4180.0
+
+data:
+  primary_candidate: Data/Abat Oliba Building/Abat_Oliba/Abat_Oliba_Data.xlsx
+  heating_candidates:
+    - Data/DHC network/data/District Heating_updated_16_07_2025_1.xlsx
+    - Data/DHC network/data/District Heating_updated_16_07_2025_2.xlsx
+  cooling_candidate: Data/DHC network/data/District Cooling_updated_16_07_2025.xlsx
+  modbus_metadata: Data/20250915_Modbus.xlsx
+
+outputs:
+  tables: Results/tables
+  figures: Results/figures
+  processed_data: Results/processed_data
+  models: Results/models
+
+inventory:
+  sheet_summary: Results/tables/data_inventory_sheets.csv
+  column_summary: Results/tables/data_inventory_columns.csv
+  errors: Results/tables/data_inventory_errors.csv
+

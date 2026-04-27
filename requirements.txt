@@ -1,0 +1,13 @@
+pandas>=2.2
+openpyxl>=3.1
+numpy>=1.26
+matplotlib>=3.8
+plotly>=5.20
+seaborn>=0.13
+scikit-learn>=1.4
+scipy>=1.12
+tslearn>=0.6
+torch>=2.2
+constrained-linkage>=1.0.1
+pyyaml>=6.0
+jupyterlab>=4.1

@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Raw/private thesis inputs. Keep these local and document source paths instead.
+Data/
+Articles/
+Materials/
+Thesis drafts/
+*.xlsx
+*.xls
+*.xlsm
+*.docx
+*.pdf
+*.zip
+
+Results/models/
+Results/processed_data/
+Results/tables/baseline_delta_t_*.csv
+!Results/tables/baseline_delta_t_summary.csv
