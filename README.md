@@ -14,6 +14,32 @@ The project has three main objectives:
 2. Apply the replicated method to the available hotel/district heating sensor data from Catalunya.
 3. Propose, implement, and evaluate improvements to the original approach.
 
+## Dataset Comparison and Method Implications
+
+The available Montserrat / Abat Oliba data is meaningfully different from the dataset used in the HEAT paper. This affects how closely the original method should be reproduced and how much emphasis should be placed on clustering.
+
+| Aspect | Montserrat / Abat Oliba project | HEAT example paper |
+| --- | --- | --- |
+| System type | Real micro-district heating network in Montserrat, Catalunya, with multiple buildings / heat exchangers. | Real district heating network in southern Shandong, China. |
+| Scale | Much smaller: around 10-12 consumer/building-level datasets, plus generation plant data. | Much larger: 248 substations. |
+| Time coverage | Stronger long-term coverage. Many temperature series span multiple years, and the DHC heating sheets inspected so far run up to July 2025. | Short but dense: January 2024 only, 31 days. |
+| Sampling rate | Mostly high-frequency, often around 5-15 minute intervals depending on sheet/sensor. | Fixed 5-minute logging, giving 8,928 samples per substation. |
+| Main columns | Most DHC building sheets contain timestamp, power, return temperature, and supply temperature. Abat Oliba internal data also contains richer building-level signals such as DH temperatures, room/floor temperatures, DHW temperatures, outdoor temperature, humidity, setpoints, and air quality. | Timestamp, primary supply temperature, primary return temperature, primary flow, outdoor temperature, delta-T, energy consumption, and water volume. |
+| Flow data | Not consistently available directly. Flow can be estimated from power and delta-T using the supervisor formula, but units must be validated. | Direct flow rate is available in L/min. |
+| Labels / known faults | Mostly unlabeled so far. This is the biggest weakness for evaluation. | Partially labeled with known fault types and normal behavior. |
+| Network/topology information | Strong contextual advantage: reports, pipe/layout information, pump information, and building-specific context are available. | HEAT approximated topology from supply-temperature similarity rather than using real geographic layout directly. |
+| Best suited method | Per-substation time-series anomaly detection, physics-informed features, robust thresholds, reconstruction error, and expert review. Clustering can still be used as a small supporting comparison, but it should not be the central method. | HEAT-style clustering is well suited because 248 substations provide many peers for cluster-based comparison. |
+
+Practical implication: this thesis should treat HEAT as the reference paper and methodological inspiration, not as a method to reproduce unchanged. With only around 10-12 substations, cluster assignments will be less statistically stable and less useful for peer-group fault detection. The stronger direction is to build a robust per-substation anomaly-detection pipeline using long time coverage, thermal features, operational context, and limited cross-substation comparison where it is defensible.
+
+Updated technical direction:
+
+1. Prioritize per-substation baselines first: low delta-T, rolling MAD, percentile thresholds, and power/delta-T/flow consistency checks.
+2. Use clustering only as a secondary analysis: compare similar buildings or operating regimes, but do not make the thesis depend on discovering many stable substation clusters.
+3. Use the long historical coverage as the main strength: learn normal seasonal and operating patterns within each substation.
+4. Add physics-informed validation: derive flow from `m = Power / (Cp * delta-T)`, check units, and flag physically inconsistent periods.
+5. Evaluate through triangulation: plots, anomaly event tables, maintenance/alarm information if available, and supervisor/domain review.
+
 ## Repository Structure
 
 ```text
@@ -375,6 +401,7 @@ Data/DHC network/data/District Heating_updated_16_07_2025_2.xlsx
 
 Notes:
 
+
 ```text
 TODO: Paste description of district heating variables and metadata.
 ```
@@ -423,11 +450,11 @@ TODO: Paste useful metadata, sensor naming, register mappings, and units.
 
 1. Inspect all data files and create a data inventory.
 2. Build a clean preprocessing pipeline.
-3. Reproduce the HEAT method as closely as possible.
-4. Run the replicated method on the Catalunya hotel/building data.
-5. Evaluate detected anomalies using available operational knowledge, labels, or expert review.
-6. Implement improvements.
-7. Compare original HEAT replication against improved variants.
+3. Build per-substation anomaly-detection baselines using delta-T, power, derived flow, and rolling/seasonal thresholds.
+4. Use the HEAT paper as a reference implementation target only where it transfers cleanly to the smaller dataset.
+5. Treat clustering as a secondary comparison or ablation, not the central thesis method.
+6. Evaluate detected anomalies using available operational knowledge, labels, maintenance/alarm records, or expert review.
+7. Implement improvements focused on physics-informed features, robust scoring, and explainability.
 8. Save results, plots, and experiment notes in `Results/`.
 
 ## Candidate Improvements to Explore
@@ -442,7 +469,7 @@ Possible categories:
 
 - Better preprocessing for missing or irregular sensor data.
 - Alternative encoder architectures.
-- Improved clustering or constraint handling.
+- Smaller-scale clustering or operating-regime grouping as a secondary comparison.
 - Domain-informed feature engineering.
 - Robust anomaly scoring.
 - Explainability for detected faults.
@@ -531,8 +558,10 @@ Potential future files:
 - [x] Extract the HEAT paper methodology into implementation requirements.
 - [x] Decide the first minimal replication target: `Ground floor` and `First floor` from the Abat Oliba workbook for a pipeline baseline.
 - [x] Start a baseline script in `Codes/`.
-- [ ] Inspect the baseline plots and choose a more informative threshold/windowing strategy.
-- [ ] Map the real district-heating DHC sheets before drawing thesis conclusions from the baseline.
+- [x] Map the real district-heating DHC sheets before drawing thesis conclusions from the baseline.
+- [ ] Inspect DHC baseline plots, especially `cons_hostatgeria_underfloor_hea`.
+- [ ] Add rolling or seasonal thresholds for per-substation anomaly detection.
+- [ ] Validate power and flow units before using derived flow as a thesis feature.
 
 ## Current Code Entry Points
 
