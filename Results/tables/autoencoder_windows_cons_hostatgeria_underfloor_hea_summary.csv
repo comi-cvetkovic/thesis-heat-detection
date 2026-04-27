@@ -1,0 +1,2 @@
+sheet,resample_interval,window_hours,stride_hours,resampled_rows,windows,features,start,end,output
+cons_hostatgeria_underfloor_hea,15min,24,12,32875,683,"supply_temp_c, return_temp_c, derived_flow_kg_s",2024-01-03 15:45:00,2025-06-22 20:00:00,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\processed_data\autoencoder_windows_cons_hostatgeria_underfloor_hea.npz

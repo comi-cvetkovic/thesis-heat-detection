@@ -30,15 +30,16 @@ The available Montserrat / Abat Oliba data is meaningfully different from the da
 | Network/topology information | Strong contextual advantage: reports, pipe/layout information, pump information, and building-specific context are available. | HEAT approximated topology from supply-temperature similarity rather than using real geographic layout directly. |
 | Best suited method | Per-substation time-series anomaly detection, physics-informed features, robust thresholds, reconstruction error, and expert review. Clustering can still be used as a small supporting comparison, but it should not be the central method. | HEAT-style clustering is well suited because 248 substations provide many peers for cluster-based comparison. |
 
-Practical implication: this thesis should treat HEAT as the reference paper and methodological inspiration, not as a method to reproduce unchanged. With only around 10-12 substations, cluster assignments will be less statistically stable and less useful for peer-group fault detection. The stronger direction is to build a robust per-substation anomaly-detection pipeline using long time coverage, thermal features, operational context, and limited cross-substation comparison where it is defensible.
+Practical implication: this thesis should treat HEAT as the reference paper and methodological inspiration, not as a method to reproduce unchanged. With only around 10-12 substations, cluster assignments will be less statistically stable and less useful for peer-group fault detection. The stronger direction is to build a robust reconstruction-based per-substation anomaly-detection pipeline using long time coverage, thermal features, operational context, and limited cross-substation comparison where it is defensible.
 
 Updated technical direction:
 
-1. Prioritize per-substation baselines first: low delta-T, rolling MAD, percentile thresholds, and power/delta-T/flow consistency checks.
-2. Use clustering only as a secondary analysis: compare similar buildings or operating regimes, but do not make the thesis depend on discovering many stable substation clusters.
-3. Use the long historical coverage as the main strength: learn normal seasonal and operating patterns within each substation.
-4. Add physics-informed validation: derive flow from `m = Power / (Cp * delta-T)`, check units, and flag physically inconsistent periods.
-5. Evaluate through triangulation: plots, anomaly event tables, maintenance/alarm information if available, and supervisor/domain review.
+1. Prioritize the autoencoder as the main method: reconstruct three-channel windows containing supply temperature, return temperature, and derived water flow.
+2. Use per-substation baselines as interpretable references: low delta-T, rolling MAD, percentile thresholds, and power/delta-T/flow consistency checks.
+3. Use clustering only as a secondary analysis: compare similar buildings, operating windows, or latent representations, but do not make the thesis depend on discovering many stable substation clusters.
+4. Use the long historical coverage as the main strength: learn normal seasonal and operating patterns within each substation.
+5. Add physics-informed validation: derive flow from `m = Power / (Cp * delta-T)`, check units, and flag physically inconsistent periods.
+6. Evaluate through triangulation: plots, anomaly event tables, maintenance/alarm information if available, and supervisor/domain review.
 
 ## Repository Structure
 
@@ -450,11 +451,11 @@ TODO: Paste useful metadata, sensor naming, register mappings, and units.
 
 1. Inspect all data files and create a data inventory.
 2. Build a clean preprocessing pipeline.
-3. Build per-substation anomaly-detection baselines using delta-T, power, derived flow, and rolling/seasonal thresholds.
-4. Use the HEAT paper as a reference implementation target only where it transfers cleanly to the smaller dataset.
-5. Treat clustering as a secondary comparison or ablation, not the central thesis method.
-6. Evaluate detected anomalies using available operational knowledge, labels, maintenance/alarm records, or expert review.
-7. Implement improvements focused on physics-informed features, robust scoring, and explainability.
+3. Build autoencoder-ready three-channel windows: supply temperature, return temperature, and derived water flow.
+4. Train a reconstruction-based autoencoder and score windows using reconstruction error.
+5. Build per-substation anomaly-detection baselines using delta-T, derived flow, and rolling/seasonal thresholds as interpretable references.
+6. Treat clustering as a secondary comparison or ablation, not the central thesis method.
+7. Evaluate detected anomalies using available operational knowledge, labels, maintenance/alarm records, or expert review.
 8. Save results, plots, and experiment notes in `Results/`.
 
 ## Candidate Improvements to Explore
@@ -559,7 +560,9 @@ Potential future files:
 - [x] Decide the first minimal replication target: `Ground floor` and `First floor` from the Abat Oliba workbook for a pipeline baseline.
 - [x] Start a baseline script in `Codes/`.
 - [x] Map the real district-heating DHC sheets before drawing thesis conclusions from the baseline.
-- [ ] Inspect DHC baseline plots, especially `cons_hostatgeria_underfloor_hea`.
+- [x] Build the first autoencoder-ready dataset using supply temperature, return temperature, and derived water flow.
+- [x] Train a first reconstruction autoencoder smoke test on `cons_hostatgeria_underfloor_hea`.
+- [ ] Inspect autoencoder reconstruction-error windows and compare them with low-delta-T baseline anomalies.
 - [ ] Add rolling or seasonal thresholds for per-substation anomaly detection.
 - [ ] Validate power and flow units before using derived flow as a thesis feature.
 
@@ -693,3 +696,85 @@ Current baseline result:
 - `cons_hostatgeria_DHW_radiators`: 258,918 active rows, median active delta-T about 5.46 C, 0 anomalies at z <= -3.5.
 - `cons_hostatgeria_underfloor_hea`: 123,461 active rows, median active delta-T about 32.46 C, 940 anomalies at z <= -3.5.
 - `cons_nostra_senyora`: 265,570 active rows, median active delta-T about 9.77 C, 0 anomalies at z <= -3.5.
+
+### Autoencoder Window Preparation
+
+Script:
+
+```text
+Codes/scripts/prepare_autoencoder_windows.py
+```
+
+Purpose:
+
+- Builds fixed-length windows for the reconstruction autoencoder.
+- Uses the supervisor-requested three input channels:
+  - supply temperature
+  - return temperature
+  - derived water flow
+- Derives water flow from `m = Power / (Cp * (Ts - Tr))`, assuming source power is in `kW`.
+- Filters to active heating periods where `power > 0`, `Supply - Return > 0`, and derived flow is finite and positive.
+- Resamples to a fixed 15-minute interval, interpolates short gaps, standardizes the three channels, and writes compressed NumPy windows.
+
+Command:
+
+```text
+.\.venv\Scripts\python.exe Codes\scripts\prepare_autoencoder_windows.py
+```
+
+Outputs:
+
+```text
+Results/processed_data/autoencoder_windows_cons_hostatgeria_underfloor_hea.npz
+Results/tables/autoencoder_windows_cons_hostatgeria_underfloor_hea_summary.csv
+```
+
+Current result:
+
+- Sheet: `cons_hostatgeria_underfloor_hea`
+- Features: `supply_temp_c`, `return_temp_c`, `derived_flow_kg_s`
+- Resampling: 15 minutes
+- Window length: 24 hours
+- Window stride: 12 hours
+- Prepared windows: 683
+- Time range after active-heating filtering/resampling: 2024-01-03 to 2025-06-22
+
+### Autoencoder Reconstruction Baseline
+
+Scripts:
+
+```text
+Codes/src/autoencoder.py
+Codes/scripts/train_autoencoder.py
+```
+
+Purpose:
+
+- Trains a small 1D convolutional autoencoder on the prepared three-channel windows.
+- The model input and output are the same shape: supply temperature, return temperature, and derived flow over one time window.
+- Reconstruction error is used as the anomaly score.
+- The first threshold is the 99th percentile of training reconstruction error.
+
+Command:
+
+```text
+.\.venv\Scripts\python.exe Codes\scripts\train_autoencoder.py --epochs 10
+```
+
+Outputs:
+
+```text
+Results/models/autoencoder_cons_hostatgeria_underfloor_hea.pt
+Results/tables/autoencoder_training_history_cons_hostatgeria_underfloor_hea.csv
+Results/tables/autoencoder_scores_cons_hostatgeria_underfloor_hea.csv
+Results/tables/autoencoder_summary_cons_hostatgeria_underfloor_hea.csv
+Results/figures/autoencoder_reconstruction_error_cons_hostatgeria_underfloor_hea.png
+```
+
+Current smoke-test result:
+
+- Windows: 683 total, split into 546 train windows and 137 test windows.
+- Training loss decreased from about 1.02 to 0.36 over 10 epochs.
+- 99th-percentile training reconstruction threshold: about 1.048 MSE on normalized channels.
+- Flagged windows: 9 total, including 6 training windows and 3 test windows.
+- Highest reconstruction-error windows currently start around 2024-07-03, 2024-07-23, 2024-06-30, and 2025-03-15.
