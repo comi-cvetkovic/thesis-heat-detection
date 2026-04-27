@@ -595,3 +595,72 @@ Current baseline result:
 
 - `Ground floor`: 212,293 rows, 2022-01-27 to 2025-02-06, median temperature separation about 1.49 C, 0 anomalies at z <= -3.5.
 - `First floor`: 288,435 rows, 2020-12-26 to 2025-02-06, median temperature separation about 2.24 C, 0 anomalies at z <= -3.5.
+
+### DHC Heating Candidate Summary
+
+Script:
+
+```text
+Codes/scripts/summarize_dhc_heating.py
+```
+
+Purpose:
+
+- Summarizes likely district-heating candidate sheets from the DHC workbooks.
+- Computes `delta_t_c = Supply Temperature - Return Temperature`.
+- Reports date range, median power, median delta-T, positive delta-T fraction, and active-heating fraction.
+- Estimates mass flow from power assuming power is in `kW`, using the supervisor formula.
+
+Command:
+
+```text
+.\.venv\Scripts\python.exe Codes\scripts\summarize_dhc_heating.py
+```
+
+Output:
+
+```text
+Results/tables/dhc_heating_sheet_summary.csv
+```
+
+Current interpretation:
+
+- `cons_abat_oliba`, `cons_hostatgeria_DHW_radiators`, `cons_hostatgeria_underfloor_hea`, and `cons_nostra_senyora` are the most relevant immediate DHC sheets from the second heating workbook.
+- `cons_abat_cisneros`, `cons_abat_garriga`, and `cons_abat_marcet` are also technically usable but may be less central unless they map to the thesis building scope.
+- `cons_nostra_senyora` includes a `flow (kg/s)` column, but the reported values do not match the supervisor formula under a simple `kW` power assumption. Treat that flow column as unvalidated until units are confirmed.
+
+### DHC Low Delta-T Baseline
+
+Script:
+
+```text
+Codes/scripts/run_dhc_delta_t_baseline.py
+```
+
+Purpose:
+
+- Runs a low delta-T anomaly baseline on selected DHC heating sheets.
+- Filters to active heating periods using `power > 0` and `Supply - Return > 0`.
+- Computes robust MAD modified z-scores on active-heating `delta_t_c`.
+- Flags unusually low active-heating delta-T values.
+
+Command:
+
+```text
+.\.venv\Scripts\python.exe Codes\scripts\run_dhc_delta_t_baseline.py
+```
+
+Outputs:
+
+```text
+Results/tables/dhc_delta_t_baseline_summary.csv
+Results/processed_data/dhc_delta_t_baseline_*.csv
+Results/figures/dhc_delta_t_baseline_*.png
+```
+
+Current baseline result:
+
+- `cons_abat_oliba`: 67,207 active rows, median active delta-T about 3.92 C, 0 anomalies at z <= -3.5.
+- `cons_hostatgeria_DHW_radiators`: 258,918 active rows, median active delta-T about 5.46 C, 0 anomalies at z <= -3.5.
+- `cons_hostatgeria_underfloor_hea`: 123,461 active rows, median active delta-T about 32.46 C, 940 anomalies at z <= -3.5.
+- `cons_nostra_senyora`: 265,570 active rows, median active delta-T about 9.77 C, 0 anomalies at z <= -3.5.
