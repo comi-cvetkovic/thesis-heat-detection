@@ -1,0 +1,2 @@
+sheet,resample_interval,window_hours,stride_hours,resampled_rows,windows,features,start,end,complete_rows,output
+cons_nostra_senyora,15min,24,12,97702,1111,"supply_temp_c, return_temp_c, derived_flow_kg_s",2022-10-02 20:00:00,2025-07-16 13:15:00,53568,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\processed_data\autoencoder_windows_cons_nostra_senyora.npz

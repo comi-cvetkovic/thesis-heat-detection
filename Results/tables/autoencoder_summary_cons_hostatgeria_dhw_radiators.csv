@@ -1,0 +1,2 @@
+windows,train_windows,test_windows,features,threshold_train_p99,flagged_windows,model_path,scores_path,figure_path
+1075,860,215,"supply_temp_c, return_temp_c, derived_flow_kg_s",0.29769811034202576,13,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\models\autoencoder_cons_hostatgeria_dhw_radiators.pt,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\tables\autoencoder_scores_cons_hostatgeria_dhw_radiators.csv,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\figures\autoencoder_reconstruction_error_cons_hostatgeria_dhw_radiators.png

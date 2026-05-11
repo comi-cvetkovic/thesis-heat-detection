@@ -813,3 +813,41 @@ Current inspection result:
 - The corrected top flagged windows are true 24-hour windows with 96 resampled points each.
 - Three of the strongest flagged windows overlap heavily with low delta-T anomalies around 2024-04-03 to 2024-04-05.
 - One flagged window around 2024-10-25 does not overlap low delta-T anomalies, which suggests the autoencoder may also detect a different abnormal operating regime.
+
+### Multi-Sheet Autoencoder Comparison
+
+Script:
+
+```text
+Codes/scripts/compare_autoencoder_runs.py
+```
+
+Purpose:
+
+- Compares the corrected autoencoder runs across the main DHC candidate sheets.
+- Summarizes retained windows, flagged-window counts, thresholds, and whether the top inspected windows overlap low delta-T anomalies.
+
+Command:
+
+```text
+.\.venv\Scripts\python.exe Codes\scripts\compare_autoencoder_runs.py
+```
+
+Output:
+
+```text
+Results/tables/autoencoder_multi_sheet_comparison.csv
+```
+
+Current comparison result:
+
+- `cons_hostatgeria_underfloor_hea`: 323 windows, 4 flagged windows, 3 of the top inspected windows overlap low delta-T anomalies. This is currently the strongest and most interpretable case.
+- `cons_abat_oliba`: 955 windows, 8 flagged windows, top inspected windows show extremely low supply-return separation and very large derived-flow values, but no overlap with the strict low delta-T baseline. This looks important, but the behavior may be dominated by the derived-flow calculation when delta-T becomes very small.
+- `cons_hostatgeria_DHW_radiators`: 1,075 windows, 13 flagged windows, no overlap with the strict low delta-T baseline in the top inspected windows. This sheet remains harder to interpret because supply/return direction and operating mode already looked questionable.
+- `cons_nostra_senyora`: 1,111 windows, 9 flagged windows, no overlap with the strict low delta-T baseline in the top inspected windows. This sheet also carries the earlier warning that reported flow and derived flow do not agree under a simple unit assumption.
+
+Current practical ranking:
+
+1. `cons_hostatgeria_underfloor_hea` as the best current thesis case for interpretable anomaly analysis.
+2. `cons_abat_oliba` as the next most interesting sheet, but with a stronger need to validate the flow derivation and small-delta-T behavior.
+3. `cons_hostatgeria_DHW_radiators` and `cons_nostra_senyora` as secondary sheets until units and operating interpretation are clearer.

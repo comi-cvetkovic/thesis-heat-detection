@@ -1,0 +1,2 @@
+sheet,resample_interval,window_hours,stride_hours,resampled_rows,windows,features,start,end,complete_rows,output
+cons_abat_oliba,15min,24,12,66888,955,"supply_temp_c, return_temp_c, derived_flow_kg_s",2023-08-19 18:45:00,2025-07-16 12:30:00,47594,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\processed_data\autoencoder_windows_cons_abat_oliba.npz

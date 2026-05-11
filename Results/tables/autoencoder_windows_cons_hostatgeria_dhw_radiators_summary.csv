@@ -1,0 +1,2 @@
+sheet,resample_interval,window_hours,stride_hours,resampled_rows,windows,features,start,end,complete_rows,output
+cons_hostatgeria_DHW_radiators,15min,24,12,122864,1075,"supply_temp_c, return_temp_c, derived_flow_kg_s",2022-01-13 17:00:00,2025-07-16 12:45:00,52351,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\processed_data\autoencoder_windows_cons_hostatgeria_dhw_radiators.npz
