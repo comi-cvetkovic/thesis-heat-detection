@@ -1,0 +1,2 @@
+sheet,resample_interval,window_hours,stride_hours,flow_feature_mode,min_delta_t_c,flow_clip_quantile,resampled_rows,windows,features,start,end,complete_rows,output
+cons_abat_oliba,15min,24,12,stabilized_log,2.0,0.995,66888,955,"supply_temp_c, return_temp_c, stabilized_flow_log_feature",2023-08-19 18:45:00,2025-07-16 12:30:00,47594,D:\Downloads\KTH\Masters Thesis\thesis-heat-detection\Results\processed_data\autoencoder_windows_cons_abat_oliba_stabilized_log.npz

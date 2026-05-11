@@ -851,3 +851,28 @@ Current practical ranking:
 1. `cons_hostatgeria_underfloor_hea` as the best current thesis case for interpretable anomaly analysis.
 2. `cons_abat_oliba` as the next most interesting sheet, but with a stronger need to validate the flow derivation and small-delta-T behavior.
 3. `cons_hostatgeria_DHW_radiators` and `cons_nostra_senyora` as secondary sheets until units and operating interpretation are clearer.
+
+### Stabilized Flow Lens
+
+Script:
+
+```text
+Codes/scripts/compare_autoencoder_lenses.py
+```
+
+Purpose:
+
+- Compares two versions of the third autoencoder channel:
+  - `raw`: direct derived flow from `m = Power / (Cp * delta-T)`
+  - `stabilized_log`: derived flow with a floored delta-T denominator, upper-tail clipping, and `log1p` scaling
+- Tests whether the autoencoder is reacting to real thermal behavior or mostly to flow blow-ups when delta-T becomes very small.
+
+Current lens comparison:
+
+- For `cons_abat_oliba`, the stabilized-flow lens is clearly better behaved. The raw-flow lens flagged windows dominated by extremely small supply-return separation and very large derived-flow values. The stabilized lens shifts the top flagged windows to more moderate operating patterns and removes the obvious flow blow-up dominance.
+- For `cons_hostatgeria_underfloor_hea`, the stabilized-flow lens changes little. The same April 2024 low delta-T windows remain the strongest flagged periods, which suggests the case is not an artifact of the raw flow calculation.
+
+Current interpretation:
+
+- Use `stabilized_log` as the safer secondary lens for sheets like `cons_abat_oliba` where very small delta-T can overwhelm the raw derived-flow channel.
+- Keep `cons_hostatgeria_underfloor_hea` as the main case study because its anomaly signal is stable under both lenses.

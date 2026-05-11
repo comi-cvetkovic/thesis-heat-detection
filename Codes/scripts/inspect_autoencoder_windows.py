@@ -19,12 +19,14 @@ if str(ROOT) not in sys.path:
 
 from Codes.scripts.prepare_autoencoder_windows import (
     DEFAULT_WORKBOOK,
+    BASE_FEATURES,
     POWER_COL,
     RETURN_COL,
     SUPPLY_COL,
     TIMESTAMP_COL,
     clean_name,
     load_feature_frame,
+    resolve_flow_feature_name,
 )
 from Codes.src.features import add_delta_t
 
@@ -40,6 +42,9 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--resample-interval", default="15min")
     parser.add_argument("--window-hours", type=int, default=24)
+    parser.add_argument("--flow-feature-mode", choices=["raw", "stabilized_log"], default="raw")
+    parser.add_argument("--min-delta-t-c", type=float, default=2.0)
+    parser.add_argument("--flow-clip-quantile", type=float, default=0.995)
     parser.add_argument("--top-k", type=int, default=6)
     parser.add_argument("--tables-dir", type=Path, default=ROOT / "Results" / "tables")
     parser.add_argument("--figures-dir", type=Path, default=ROOT / "Results" / "figures")
@@ -70,7 +75,15 @@ def main() -> None:
     args = parse_args()
     slug = clean_name(args.sheet)
     scores = pd.read_csv(args.scores, parse_dates=["window_start"])
-    feature_frame = load_feature_frame(args.workbook, args.sheet, args.resample_interval)
+    feature_frame, feature_columns = load_feature_frame(
+        args.workbook,
+        args.sheet,
+        args.resample_interval,
+        args.flow_feature_mode,
+        args.min_delta_t_c,
+        args.flow_clip_quantile,
+    )
+    flow_feature_name = feature_columns[-1]
     baseline_frame = load_baseline_frame(args.workbook, args.sheet)
     baseline_frame = baseline_frame.set_index(TIMESTAMP_COL)
 
@@ -101,7 +114,7 @@ def main() -> None:
                 "resampled_points": len(window_features),
                 "median_supply_temp_c": window_features["supply_temp_c"].median(),
                 "median_return_temp_c": window_features["return_temp_c"].median(),
-                "median_derived_flow_kg_s": window_features["derived_flow_kg_s"].median(),
+                f"median_{flow_feature_name}": window_features[flow_feature_name].median(),
                 "median_delta_t_c": window_baseline["delta_t_c"].median(),
                 "min_delta_t_c": window_baseline["delta_t_c"].min(),
                 "low_delta_t_anomaly_points": low_delta_count,
@@ -114,8 +127,8 @@ def main() -> None:
         axes[0].set_ylabel("Supply C")
         axes[1].plot(window_features.index, window_features["return_temp_c"], linewidth=0.8, color="tab:green")
         axes[1].set_ylabel("Return C")
-        axes[2].plot(window_features.index, window_features["derived_flow_kg_s"], linewidth=0.8, color="tab:purple")
-        axes[2].set_ylabel("Flow kg/s")
+        axes[2].plot(window_features.index, window_features[flow_feature_name], linewidth=0.8, color="tab:purple")
+        axes[2].set_ylabel(flow_feature_name)
         axes[3].plot(window_baseline.index, window_baseline["delta_t_c"], linewidth=0.8, color="tab:orange")
         overlapping = window_baseline[window_baseline["is_low_delta_t_anomaly"].fillna(False)]
         if not overlapping.empty:
@@ -128,12 +141,14 @@ def main() -> None:
         )
         fig.autofmt_xdate()
         fig.tight_layout()
-        figure_path = args.figures_dir / f"inspect_autoencoder_{slug}_{rank:02d}.png"
+        output_suffix = "" if args.flow_feature_mode == "raw" else f"_{args.flow_feature_mode}"
+        figure_path = args.figures_dir / f"inspect_autoencoder_{slug}{output_suffix}_{rank:02d}.png"
         fig.savefig(figure_path, dpi=160)
         plt.close(fig)
 
     inspection = pd.DataFrame(inspection_rows)
-    summary_path = args.tables_dir / f"inspect_autoencoder_{slug}_summary.csv"
+    output_suffix = "" if args.flow_feature_mode == "raw" else f"_{args.flow_feature_mode}"
+    summary_path = args.tables_dir / f"inspect_autoencoder_{slug}{output_suffix}_summary.csv"
     inspection.to_csv(summary_path, index=False)
     print(inspection.to_string(index=False))
     print(f"\nWrote summary: {summary_path}")

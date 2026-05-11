@@ -61,6 +61,7 @@ def main() -> None:
     windows_np = data["windows"].astype(np.float32)
     starts = pd.to_datetime(data["window_start"])
     feature_names = [str(value) for value in data["feature_names"]]
+    flow_feature_mode = str(data["flow_feature_mode"]) if "flow_feature_mode" in data else "raw"
 
     split_index = max(1, int(len(windows_np) * args.train_fraction))
     train_np = windows_np[:split_index]
@@ -102,6 +103,7 @@ def main() -> None:
             "feature_names": feature_names,
             "means": data["means"],
             "stds": data["stds"],
+            "flow_feature_mode": flow_feature_mode,
             "threshold_train_p99": threshold,
             "windows_path": str(args.windows),
         },
@@ -129,6 +131,7 @@ def main() -> None:
                 "train_windows": split_index,
                 "test_windows": len(windows_np) - split_index,
                 "features": ", ".join(feature_names),
+                "flow_feature_mode": flow_feature_mode,
                 "threshold_train_p99": threshold,
                 "flagged_windows": int(anomaly_flags.sum()),
                 "model_path": model_path,
