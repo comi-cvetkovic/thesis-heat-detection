@@ -736,8 +736,10 @@ Current result:
 - Resampling: 15 minutes
 - Window length: 24 hours
 - Window stride: 12 hours
-- Prepared windows: 683
-- Time range after active-heating filtering/resampling: 2024-01-03 to 2025-06-22
+- Minimum active-heating share per retained window: 60%
+- Minimum complete-data share per retained window: 85%
+- Prepared windows: 323
+- Time range after active-heating resampling: 2022-01-10 to 2025-07-16
 
 ### Autoencoder Reconstruction Baseline
 
@@ -773,8 +775,41 @@ Results/figures/autoencoder_reconstruction_error_cons_hostatgeria_underfloor_hea
 
 Current smoke-test result:
 
-- Windows: 683 total, split into 546 train windows and 137 test windows.
-- Training loss decreased from about 1.02 to 0.36 over 10 epochs.
-- 99th-percentile training reconstruction threshold: about 1.048 MSE on normalized channels.
-- Flagged windows: 9 total, including 6 training windows and 3 test windows.
-- Highest reconstruction-error windows currently start around 2024-07-03, 2024-07-23, 2024-06-30, and 2025-03-15.
+- Windows: 323 total, split into 258 train windows and 65 test windows.
+- Training loss ended around 0.49 after 10 epochs on the corrected window set.
+- 99th-percentile training reconstruction threshold: about 2.222 MSE on normalized channels.
+- Flagged windows: 4 total.
+- Highest reconstruction-error windows currently start around 2024-04-03, 2024-04-04, and 2024-10-25.
+
+### Flagged Autoencoder Window Inspection
+
+Script:
+
+```text
+Codes/scripts/inspect_autoencoder_windows.py
+```
+
+Purpose:
+
+- Inspects the top reconstruction-error windows from the autoencoder.
+- Compares each flagged window against the raw three channels and the low delta-T baseline.
+- Produces a summary table and one multi-panel figure per flagged window.
+
+Command:
+
+```text
+.\.venv\Scripts\python.exe Codes\scripts\inspect_autoencoder_windows.py
+```
+
+Outputs:
+
+```text
+Results/tables/inspect_autoencoder_cons_hostatgeria_underfloor_hea_summary.csv
+Results/figures/inspect_autoencoder_cons_hostatgeria_underfloor_hea_*.png
+```
+
+Current inspection result:
+
+- The corrected top flagged windows are true 24-hour windows with 96 resampled points each.
+- Three of the strongest flagged windows overlap heavily with low delta-T anomalies around 2024-04-03 to 2024-04-05.
+- One flagged window around 2024-10-25 does not overlap low delta-T anomalies, which suggests the autoencoder may also detect a different abnormal operating regime.

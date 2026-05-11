@@ -43,34 +43,59 @@ def load_feature_frame(workbook: Path, sheet: str, resample_interval: str) -> pd
     frame["supply_temp_c"] = pd.to_numeric(frame[SUPPLY_COL], errors="coerce")
     frame["return_temp_c"] = pd.to_numeric(frame[RETURN_COL], errors="coerce")
     frame["power_kw"] = pd.to_numeric(frame[POWER_COL], errors="coerce")
-    frame = frame.set_index(TIMESTAMP_COL)
-
-    valid = (
+    frame["is_active_heating"] = (
         (frame["power_kw"] > 0)
         & (frame["delta_t_c"] > 0)
         & np.isfinite(frame["derived_flow_kg_s"])
         & (frame["derived_flow_kg_s"] > 0)
     )
-    frame = frame.loc[valid, list(FEATURES)]
-    frame = frame.resample(resample_interval).median()
-    frame = frame.interpolate(method="time", limit=4).dropna()
-    return frame
+    frame = frame.set_index(TIMESTAMP_COL)
+
+    for feature in FEATURES:
+        frame.loc[~frame["is_active_heating"], feature] = np.nan
+
+    feature_frame = frame.loc[:, list(FEATURES)].resample(resample_interval).median()
+    feature_frame["active_fraction"] = frame["is_active_heating"].astype(float).resample(resample_interval).mean()
+    feature_frame.loc[:, FEATURES] = feature_frame.loc[:, FEATURES].interpolate(method="time", limit=4)
+    return feature_frame
 
 
 def make_windows(
-    values: np.ndarray,
+    feature_frame: pd.DataFrame,
     timestamps: pd.DatetimeIndex,
     window_steps: int,
     stride_steps: int,
+    min_active_fraction: float,
+    min_complete_fraction: float,
 ) -> tuple[np.ndarray, np.ndarray]:
     windows: list[np.ndarray] = []
     starts: list[np.datetime64] = []
 
-    for start in range(0, len(values) - window_steps + 1, stride_steps):
+    values = feature_frame.loc[:, FEATURES].to_numpy(dtype=np.float32)
+    active_fraction = feature_frame["active_fraction"].to_numpy(dtype=np.float32)
+    finite_mask = np.isfinite(values).all(axis=1)
+
+    for start in range(0, len(feature_frame) - window_steps + 1, stride_steps):
         stop = start + window_steps
         window = values[start:stop]
-        if np.isfinite(window).all():
-            windows.append(window.T)
+        window_finite = finite_mask[start:stop]
+        window_active = active_fraction[start:stop]
+        complete_fraction = float(window_finite.mean())
+        finite_active = window_active[np.isfinite(window_active)]
+        active_share = 0.0 if len(finite_active) == 0 else float(finite_active.mean())
+        if complete_fraction < min_complete_fraction:
+            continue
+        if active_share < min_active_fraction:
+            continue
+
+        imputed = window.copy()
+        if not np.isfinite(imputed).all():
+            column_means = np.nanmean(imputed, axis=0)
+            missing_rows, missing_cols = np.where(~np.isfinite(imputed))
+            imputed[missing_rows, missing_cols] = column_means[missing_cols]
+
+        if np.isfinite(imputed).all():
+            windows.append(imputed.T)
             starts.append(timestamps[start].to_datetime64())
 
     if not windows:
@@ -86,6 +111,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--resample-interval", default="15min")
     parser.add_argument("--window-hours", type=int, default=24)
     parser.add_argument("--stride-hours", type=int, default=12)
+    parser.add_argument("--min-active-fraction", type=float, default=0.6)
+    parser.add_argument("--min-complete-fraction", type=float, default=0.85)
     parser.add_argument("--output-dir", type=Path, default=ROOT / "Results" / "processed_data")
     parser.add_argument("--summary-dir", type=Path, default=ROOT / "Results" / "tables")
     return parser.parse_args()
@@ -98,12 +125,21 @@ def main() -> None:
     window_steps = int(args.window_hours * steps_per_hour)
     stride_steps = int(args.stride_hours * steps_per_hour)
 
-    raw_values = frame.loc[:, FEATURES].to_numpy(dtype=np.float32)
+    valid_rows = np.isfinite(frame.loc[:, FEATURES]).all(axis=1)
+    raw_values = frame.loc[valid_rows, FEATURES].to_numpy(dtype=np.float32)
     means = raw_values.mean(axis=0)
     stds = raw_values.std(axis=0)
     stds[stds == 0] = 1.0
-    scaled_values = (raw_values - means) / stds
-    windows, starts = make_windows(scaled_values, frame.index, window_steps, stride_steps)
+    scaled_frame = frame.copy()
+    scaled_frame.loc[:, FEATURES] = (scaled_frame.loc[:, FEATURES] - means) / stds
+    windows, starts = make_windows(
+        scaled_frame,
+        frame.index,
+        window_steps,
+        stride_steps,
+        min_active_fraction=args.min_active_fraction,
+        min_complete_fraction=args.min_complete_fraction,
+    )
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     args.summary_dir.mkdir(parents=True, exist_ok=True)
@@ -120,6 +156,8 @@ def main() -> None:
         resample_interval=args.resample_interval,
         window_hours=args.window_hours,
         stride_hours=args.stride_hours,
+        min_active_fraction=args.min_active_fraction,
+        min_complete_fraction=args.min_complete_fraction,
     )
 
     summary = pd.DataFrame(
@@ -134,6 +172,7 @@ def main() -> None:
                 "features": ", ".join(FEATURES),
                 "start": frame.index.min(),
                 "end": frame.index.max(),
+                "complete_rows": int(valid_rows.sum()),
                 "output": output_path,
             }
         ]
