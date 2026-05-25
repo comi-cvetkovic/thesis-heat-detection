@@ -26,5 +26,11 @@ class Conv1dAutoencoder(nn.Module):
         )
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        encoded = self.encoder(inputs)
+        encoded = self.encode(inputs)
+        return self.decode(encoded)
+
+    def encode(self, inputs: torch.Tensor) -> torch.Tensor:
+        return self.encoder(inputs)
+
+    def decode(self, encoded: torch.Tensor) -> torch.Tensor:
         return self.decoder(encoded)

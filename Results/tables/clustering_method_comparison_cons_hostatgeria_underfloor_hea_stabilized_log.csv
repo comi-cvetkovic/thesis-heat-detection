@@ -1,0 +1,3 @@
+method,clusters,silhouette_score,anomaly_clusters_used,max_cluster_anomaly_rate
+feature,4,0.29554787278175354,2,0.08333333333333333
+latent,4,0.1029210016131401,3,0.05263157894736842

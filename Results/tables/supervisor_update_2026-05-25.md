@@ -193,7 +193,67 @@ What clustering adds:
 
 This aligns well with the supervisor's latest request: prepare some clustering and show results, without making clustering the entire thesis.
 
-## 5. Current working conclusions
+## 5. Comparison of the two clustering methods
+
+Because the question came up whether clustering should be used together with the autoencoder, a direct comparison was added between:
+
+1. feature-space clustering
+   - cluster daily windows using hand-engineered summary features
+2. latent-space clustering
+   - cluster daily windows using the latent representations produced by the trained autoencoder encoder
+
+This comparison was run on the two most important sheets:
+
+- `cons_hostatgeria_underfloor_hea`
+- `cons_abat_oliba`
+
+Outputs:
+
+- `Results/tables/clustering_method_comparison_cons_hostatgeria_underfloor_hea_stabilized_log.csv`
+- `Results/tables/clustering_method_comparison_cons_abat_oliba_stabilized_log.csv`
+- feature-cluster summaries and latent-cluster summaries for each sheet
+- PCA scatter plots for both methods
+
+### 5.1 Results for `cons_hostatgeria_underfloor_hea`
+
+| Method | Silhouette score | Anomaly clusters used | Max cluster anomaly rate |
+| --- | ---: | ---: | ---: |
+| feature clustering | 0.296 | 2 | 0.083 |
+| latent clustering | 0.103 | 3 | 0.053 |
+
+Interpretation:
+
+- Feature clustering separates the underfloor-heating windows more clearly.
+- Autoencoder anomalies are more concentrated in a smaller number of feature clusters.
+- Latent clustering works, but the anomaly structure is more diffuse.
+
+### 5.2 Results for `cons_abat_oliba`
+
+| Method | Silhouette score | Anomaly clusters used | Max cluster anomaly rate |
+| --- | ---: | ---: | ---: |
+| feature clustering | 0.231 | 2 | 0.034 |
+| latent clustering | 0.221 | 3 | 0.019 |
+
+Interpretation:
+
+- The separation quality of the two methods is closer than in the underfloor-heating case.
+- Even here, feature clustering still concentrates anomalies slightly better.
+- Latent clustering does not currently provide a stronger anomaly-regime separation than the engineered feature clustering.
+
+### 5.3 Working conclusion from the comparison
+
+At this stage:
+
+- feature-space clustering is more useful operationally
+- latent-space clustering is technically interesting, but not yet more informative than feature clustering
+
+So the current best role assignment is:
+
+- autoencoder = main anomaly detector
+- feature clustering = best current regime-interpretation layer
+- latent clustering = useful comparison experiment, but not yet the preferred clustering method
+
+## 6. Current working conclusions
 
 Current conclusions after this iteration:
 
@@ -203,8 +263,9 @@ Current conclusions after this iteration:
 4. Time-window clustering is now implemented and producing interpretable structure.
 5. `cons_hostatgeria_underfloor_hea` remains the strongest primary case study.
 6. Clustering supports the idea that its anomalies correspond to windows that leave its dominant normal regime.
+7. Feature-space clustering currently looks more useful than latent-space clustering for meeting interpretation needs.
 
-## 6. Questions to ask the supervisor
+## 7. Questions to ask the supervisor
 
 ### Data and units
 
@@ -224,7 +285,7 @@ Current conclusions after this iteration:
 8. Are there logs, alarms, maintenance notes, or known abnormal dates for the anomalous April 2024 and October 2024 windows?
 9. Would it be acceptable to treat historical anomaly windows as candidate events and then validate them through engineering interpretation when labels are absent?
 
-## 7. Recommended next work
+## 8. Recommended next work
 
 If the supervisor agrees with the direction, the next steps should be:
 
