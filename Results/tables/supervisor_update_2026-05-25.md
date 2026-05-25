@@ -193,6 +193,104 @@ What clustering adds:
 
 This aligns well with the supervisor's latest request: prepare some clustering and show results, without making clustering the entire thesis.
 
+## 4.1 How anomalies are actually detected in the autoencoder
+
+This point needed clarification.
+
+The current autoencoder does **not** run three completely separate anomaly detectors.
+
+Instead, it works in two layers:
+
+1. **joint detection**
+   - the model takes all three channels together:
+     - supply temperature
+     - return temperature
+     - flow feature
+   - it reconstructs the full 24-hour multivariate window
+   - one total reconstruction error is computed for the whole window
+   - a window is flagged if this total error is above the training `99th percentile`
+
+2. **feature attribution**
+   - after reconstruction, the error is also broken down by channel
+   - this gives:
+     - `supply_temp_c_reconstruction_mse`
+     - `return_temp_c_reconstruction_mse`
+     - flow-feature reconstruction MSE
+   - for each channel, a separate training `99th percentile` threshold is also computed
+   - this lets us say:
+     - whether a specific channel was itself unusually hard to reconstruct
+     - which channel had the largest error in the flagged window
+
+So the current method is:
+
+`joint anomaly detection + per-feature attribution`
+
+not:
+
+`three fully independent anomaly detectors`
+
+### 4.2 What this now gives us
+
+For each scored window, the output tables now include:
+
+- total `reconstruction_mse`
+- `is_reconstruction_anomaly`
+- per-channel reconstruction MSE values
+- per-channel anomaly flags
+- `dominant_anomalous_feature`
+
+This means we can now answer questions like:
+
+- "Was this anomaly mainly a supply-temperature anomaly?"
+- "Was it mainly a return-temperature anomaly?"
+- "Was it mainly driven by the flow feature?"
+
+### 4.3 Examples from the current results
+
+From `cons_hostatgeria_underfloor_hea`:
+
+- `2024-04-03 18:45`
+  - total reconstruction MSE: `4.694`
+  - dominant anomalous feature: `supply_temp_c`
+  - supply-channel MSE: `8.822`
+  - return-channel MSE: `2.168`
+  - flow-channel MSE: `3.092`
+  - overlaps low delta-T anomalies: yes
+
+- `2024-10-25 18:45`
+  - total reconstruction MSE: `2.809`
+  - dominant anomalous feature: `return_temp_c`
+  - supply-channel MSE: `0.157`
+  - return-channel MSE: `6.934`
+  - flow-channel MSE: `1.338`
+  - overlaps low delta-T anomalies: no
+
+This is useful because the two anomalous windows are not abnormal in the same way:
+
+- the April anomaly is mainly a **supply-temperature** anomaly
+- the October anomaly is mainly a **return-temperature** anomaly
+
+From `cons_abat_oliba` under the stabilized-flow lens:
+
+- `2025-03-02 18:45`
+  - total reconstruction MSE: `0.385`
+  - dominant anomalous feature: `return_temp_c`
+  - supply-channel MSE: `0.186`
+  - return-channel MSE: `0.510`
+  - stabilized-flow-channel MSE: `0.459`
+
+This is important because under the stabilized lens, Abat Oliba is no longer obviously dominated by flow blow-up. The anomaly becomes interpretable in terms of temperature behavior as well.
+
+### 4.4 What still remains open
+
+If the supervisor wants each feature to be treated entirely on its own, the next step would be one of these:
+
+1. train separate single-channel autoencoders
+2. use the current per-channel reconstruction errors as primary feature-specific anomaly detectors
+3. combine both approaches and compare them
+
+Right now, the implementation is still multivariate first, because the joint relationships between supply, return, and flow are physically meaningful. But it now also reports which feature is driving each anomaly.
+
 ## 5. Comparison of the two clustering methods
 
 Because the question came up whether clustering should be used together with the autoencoder, a direct comparison was added between:
@@ -253,7 +351,78 @@ So the current best role assignment is:
 - feature clustering = best current regime-interpretation layer
 - latent clustering = useful comparison experiment, but not yet the preferred clustering method
 
-## 6. Current working conclusions
+## 6. Joint vs per-feature autoencoders
+
+Because the supervisor asked whether anomalies should also be visible feature by feature, a second autoencoder path was added:
+
+- one `joint` autoencoder using all three channels together
+- three `univariate` autoencoders, one for each feature:
+  - `supply_temp_c`
+  - `return_temp_c`
+  - flow feature
+
+This lets us compare:
+
+1. multivariate anomaly detection based on relationships between variables
+2. single-feature anomaly detection based on one channel at a time
+
+Outputs:
+
+- `Results/tables/autoencoder_joint_vs_univariate_cons_hostatgeria_underfloor_hea_stabilized_log.csv`
+- `Results/tables/autoencoder_joint_vs_univariate_cons_abat_oliba_stabilized_log.csv`
+- matching comparison figures in `Results/figures/`
+
+### 6.1 Results for `cons_hostatgeria_underfloor_hea`
+
+| Model | Flagged windows | Flag rate | Overlap with joint anomalies |
+| --- | ---: | ---: | ---: |
+| `joint` | 4 | 0.0124 | 4 |
+| `supply_temp_c` only | 3 | 0.0093 | 3 |
+| `return_temp_c` only | 5 | 0.0155 | 2 |
+| `flow` only | 3 | 0.0093 | 1 |
+
+Interpretation:
+
+- the strongest underfloor-heating anomalies are captured well by the `supply_temp_c`-only model
+- the `return_temp_c`-only model finds the important October anomaly and also adds a few extra candidate days
+- the flow-only model overlaps less with the joint anomalies
+
+Working conclusion:
+
+For underfloor heating, the joint model remains useful, but the anomaly story is strongly influenced by the temperature channels, especially supply temperature.
+
+### 6.2 Results for `cons_abat_oliba`
+
+| Model | Flagged windows | Flag rate | Overlap with joint anomalies |
+| --- | ---: | ---: | ---: |
+| `joint` | 12 | 0.0126 | 12 |
+| `supply_temp_c` only | 8 | 0.0084 | 2 |
+| `return_temp_c` only | 9 | 0.0094 | 3 |
+| `flow` only | 8 | 0.0084 | 0 |
+
+Interpretation:
+
+- the joint model flags more windows than any single-feature model
+- overlap between the joint anomalies and the univariate anomalies is weak
+- under the stabilized lens, the flow-only model has zero overlap with the joint anomalies
+
+Working conclusion:
+
+For Abat Oliba, the joint model appears to be detecting interactions between variables rather than only single-channel extremes. That supports keeping the multivariate model as the main detector.
+
+### 6.3 Overall interpretation
+
+This comparison shows two useful things:
+
+1. some anomalies are visible clearly in one feature alone
+2. some anomalies are only convincing when the variables are considered together
+
+So the best current role assignment is:
+
+- joint autoencoder = primary anomaly detector
+- per-feature autoencoders = comparison and interpretability layer
+
+## 7. Current working conclusions
 
 Current conclusions after this iteration:
 
@@ -264,8 +433,9 @@ Current conclusions after this iteration:
 5. `cons_hostatgeria_underfloor_hea` remains the strongest primary case study.
 6. Clustering supports the idea that its anomalies correspond to windows that leave its dominant normal regime.
 7. Feature-space clustering currently looks more useful than latent-space clustering for meeting interpretation needs.
+8. Per-feature autoencoders are useful for interpretation, but the joint autoencoder still appears to carry information that single-feature models miss.
 
-## 7. Questions to ask the supervisor
+## 8. Questions to ask the supervisor
 
 ### Data and units
 
@@ -284,8 +454,9 @@ Current conclusions after this iteration:
 
 8. Are there logs, alarms, maintenance notes, or known abnormal dates for the anomalous April 2024 and October 2024 windows?
 9. Would it be acceptable to treat historical anomaly windows as candidate events and then validate them through engineering interpretation when labels are absent?
+10. For thesis reporting, would the supervisor prefer the joint autoencoder to remain the main detector, with per-feature autoencoders used as explanation/comparison models?
 
-## 8. Recommended next work
+## 9. Recommended next work
 
 If the supervisor agrees with the direction, the next steps should be:
 

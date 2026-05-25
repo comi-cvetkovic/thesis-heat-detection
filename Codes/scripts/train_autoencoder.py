@@ -37,22 +37,35 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=1e-3)
     parser.add_argument("--train-fraction", type=float, default=0.8)
+    parser.add_argument(
+        "--feature-name",
+        default=None,
+        help="Optional single feature to train as a univariate autoencoder. Defaults to joint multivariate training.",
+    )
     parser.add_argument("--models-dir", type=Path, default=ROOT / "Results" / "models")
     parser.add_argument("--tables-dir", type=Path, default=ROOT / "Results" / "tables")
     parser.add_argument("--figures-dir", type=Path, default=ROOT / "Results" / "figures")
     return parser.parse_args()
 
 
-def reconstruction_errors(model: nn.Module, windows: torch.Tensor, batch_size: int) -> np.ndarray:
+def reconstruction_errors(
+    model: nn.Module,
+    windows: torch.Tensor,
+    batch_size: int,
+) -> tuple[np.ndarray, np.ndarray]:
     loader = DataLoader(TensorDataset(windows), batch_size=batch_size, shuffle=False)
-    errors: list[np.ndarray] = []
+    total_errors: list[np.ndarray] = []
+    channel_errors: list[np.ndarray] = []
     model.eval()
     with torch.no_grad():
         for (batch,) in loader:
             reconstructed = model(batch)
-            batch_error = ((reconstructed - batch) ** 2).mean(dim=(1, 2))
-            errors.append(batch_error.cpu().numpy())
-    return np.concatenate(errors)
+            squared_error = (reconstructed - batch) ** 2
+            batch_total_error = squared_error.mean(dim=(1, 2))
+            batch_channel_error = squared_error.mean(dim=2)
+            total_errors.append(batch_total_error.cpu().numpy())
+            channel_errors.append(batch_channel_error.cpu().numpy())
+    return np.concatenate(total_errors), np.concatenate(channel_errors)
 
 
 def main() -> None:
@@ -60,8 +73,20 @@ def main() -> None:
     data = np.load(args.windows, allow_pickle=True)
     windows_np = data["windows"].astype(np.float32)
     starts = pd.to_datetime(data["window_start"])
-    feature_names = [str(value) for value in data["feature_names"]]
+    all_feature_names = [str(value) for value in data["feature_names"]]
     flow_feature_mode = str(data["flow_feature_mode"]) if "flow_feature_mode" in data else "raw"
+
+    if args.feature_name is not None:
+        if args.feature_name not in all_feature_names:
+            available = ", ".join(all_feature_names)
+            raise ValueError(f"Unknown feature-name '{args.feature_name}'. Available features: {available}")
+        selected_index = all_feature_names.index(args.feature_name)
+        windows_np = windows_np[:, selected_index : selected_index + 1, :]
+        feature_names = [args.feature_name]
+        model_scope = "univariate"
+    else:
+        feature_names = all_feature_names
+        model_scope = "joint"
 
     split_index = max(1, int(len(windows_np) * args.train_fraction))
     train_np = windows_np[:split_index]
@@ -88,22 +113,31 @@ def main() -> None:
         history.append({"epoch": epoch, "train_loss": float(np.mean(losses))})
         print(f"epoch={epoch} train_loss={history[-1]['train_loss']:.6f}")
 
-    errors = reconstruction_errors(model, all_windows, args.batch_size)
+    errors, channel_errors = reconstruction_errors(model, all_windows, args.batch_size)
     threshold = float(np.quantile(errors[:split_index], 0.99))
     anomaly_flags = errors > threshold
+    channel_thresholds = {
+        feature_name: float(np.quantile(channel_errors[:split_index, index], 0.99))
+        for index, feature_name in enumerate(feature_names)
+    }
 
     args.models_dir.mkdir(parents=True, exist_ok=True)
     args.tables_dir.mkdir(parents=True, exist_ok=True)
     args.figures_dir.mkdir(parents=True, exist_ok=True)
     stem = args.windows.stem.replace("autoencoder_windows_", "")
+    if args.feature_name is not None:
+        feature_slug = args.feature_name.replace(" ", "_").replace("/", "_")
+        stem = f"{stem}__{feature_slug}"
     model_path = args.models_dir / f"autoencoder_{stem}.pt"
     torch.save(
         {
             "model_state_dict": model.state_dict(),
             "feature_names": feature_names,
+            "all_feature_names": all_feature_names,
             "means": data["means"],
             "stds": data["stds"],
             "flow_feature_mode": flow_feature_mode,
+            "model_scope": model_scope,
             "threshold_train_p99": threshold,
             "windows_path": str(args.windows),
         },
@@ -118,6 +152,13 @@ def main() -> None:
             "split": np.where(np.arange(len(errors)) < split_index, "train", "test"),
         }
     )
+    for index, feature_name in enumerate(feature_names):
+        scores[f"{feature_name}_reconstruction_mse"] = channel_errors[:, index]
+        scores[f"is_{feature_name}_channel_anomaly"] = (
+            scores[f"{feature_name}_reconstruction_mse"] > channel_thresholds[feature_name]
+        )
+    dominant_index = np.argmax(channel_errors, axis=1)
+    scores["dominant_anomalous_feature"] = [feature_names[index] for index in dominant_index]
     scores_path = args.tables_dir / f"autoencoder_scores_{stem}.csv"
     history_path = args.tables_dir / f"autoencoder_training_history_{stem}.csv"
     summary_path = args.tables_dir / f"autoencoder_summary_{stem}.csv"
@@ -131,8 +172,10 @@ def main() -> None:
                 "train_windows": split_index,
                 "test_windows": len(windows_np) - split_index,
                 "features": ", ".join(feature_names),
+                "model_scope": model_scope,
                 "flow_feature_mode": flow_feature_mode,
                 "threshold_train_p99": threshold,
+                **{f"{name}_threshold_train_p99": channel_thresholds[name] for name in feature_names},
                 "flagged_windows": int(anomaly_flags.sum()),
                 "model_path": model_path,
                 "scores_path": scores_path,
