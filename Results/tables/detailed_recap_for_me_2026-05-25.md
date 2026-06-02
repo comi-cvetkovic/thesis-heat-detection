@@ -59,6 +59,10 @@ There are currently two flow-based feature versions:
    - clips extreme upper values
    - applies log scaling
 
+Current supervisor-confirmed assumption:
+
+- `Power Interval Trend Log` should be treated as `kW` for all sheets
+
 ## 3. Exact preprocessing pipeline
 
 The pipeline is implemented mainly in:
@@ -73,6 +77,7 @@ The steps are:
 3. Compute `delta_t_c = supply - return`.
 4. Compute the flow feature:
    - raw or stabilized
+   - using `Power` interpreted as `kW`
 5. Define active-heating rows:
    - `power > 0`
    - `delta-T > 0`
@@ -723,7 +728,7 @@ Why:
 
 These are the main open points:
 
-1. Power unit / flow interpretation is not globally resolved.
+1. The power unit is now assumed to be `kW` for all sheets, but the flow interpretation is still not globally resolved.
 2. We do not yet have confirmed fault labels.
 3. The best final window length is not fully tested.
 4. Clustering is useful, but it is still secondary to the anomaly detector.
@@ -744,7 +749,7 @@ The strongest points:
 The cautious points:
 
 - anomalies are candidates, not confirmed faults
-- power scaling still needs supervisor validation
+- power is now assumed to be `kW`, but the resulting flow interpretation is still not equally convincing for all sheets
 - some sheets are harder to interpret than others
 - not every anomaly is best explained by one feature alone
 

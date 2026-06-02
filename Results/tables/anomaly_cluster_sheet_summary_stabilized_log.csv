@@ -1,0 +1,4 @@
+sheet,anomaly_cluster,windows,dominant_feature_mode,reconstruction_mse_median
+cons_abat_oliba,1,12,return_temp_c,0.324526745
+cons_hostatgeria_underfloor_hea,0,3,supply_temp_c,2.3978107
+cons_hostatgeria_underfloor_hea,2,1,return_temp_c,2.8034685

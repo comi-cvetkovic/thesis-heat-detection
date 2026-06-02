@@ -659,7 +659,7 @@ Current interpretation:
 
 - `cons_abat_oliba`, `cons_hostatgeria_DHW_radiators`, `cons_hostatgeria_underfloor_hea`, and `cons_nostra_senyora` are the most relevant immediate DHC sheets from the second heating workbook.
 - `cons_abat_cisneros`, `cons_abat_garriga`, and `cons_abat_marcet` are also technically usable but may be less central unless they map to the thesis building scope.
-- `cons_nostra_senyora` includes a `flow (kg/s)` column, but the reported values do not match the supervisor formula under a simple `kW` power assumption. Treat that flow column as unvalidated until units are confirmed.
+- `cons_nostra_senyora` includes a `flow (kg/s)` column, but the reported values do not match the supervisor formula even when `Power Interval Trend Log` is treated as `kW`. Treat that reported flow column as unvalidated until the subsystem / sensor interpretation is clarified.
 
 ### DHC Low Delta-T Baseline
 

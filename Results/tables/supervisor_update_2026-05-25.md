@@ -23,7 +23,7 @@ The derived flow is computed with:
 
 `m = Power / (Cp * (Ts - Tr))`
 
-If the power unit assumption is wrong, or if `delta-T` becomes very small, the derived flow can become misleading.
+If the `kW` assumption is fixed but `delta-T` becomes very small, or if the formula is not equally meaningful across subsystems, the derived flow can become misleading.
 
 ### 2.2 What was tested
 
@@ -37,29 +37,46 @@ A power-scaling sanity check was added. For each main DHC sheet, the script comp
 
 The script also computes the scale factor that would make the median flow roughly `1.5`, since the supervisor indicated expected values should often be around `1-2`.
 
+Important update after the later supervisor discussion:
+
+```text
+The power column should be treated as kW for all sheets.
+```
+
+So this check should now be interpreted as a consistency check under a fixed `kW` assumption, not as an open unit-selection question.
+
 Output file:
 
 - `Results/tables/power_scaling_sanity_check.csv`
 
 ### 2.3 Current results
 
-| Sheet | Median power (raw) | Median delta-T | Median flow if `kW` | Scale implied to reach flow `1.5` |
-| --- | ---: | ---: | ---: | ---: |
-| `cons_abat_oliba` | 30.0 | 3.92 | 2.03 | 819 |
-| `cons_hostatgeria_DHW_radiators` | 30.6 | 5.46 | 1.41 | 1119 |
-| `cons_hostatgeria_underfloor_hea` | 10.9 | 32.46 | 0.082 | 18672 |
-| `cons_nostra_senyora` | 1.0 | 9.77 | 0.021 | 61258 |
+The check was extended to all currently usable heating-consumer sheets.
+
+Main output:
+
+- `Results/tables/power_scaling_all_heating_sheets.csv`
+
+| Workbook | Sheet | Median power (active) | Median delta-T (active) | Median flow if `kW` | `kW` plausible? |
+| --- | --- | ---: | ---: | ---: | --- |
+| `_2.xlsx` | `cons_hostatgeria_DHW_radiators` | 30.6 | 5.46 | 1.410 | Yes |
+| `_1.xlsx` | `cons_abat_cisneros` | 65.8 | 11.79 | 1.669 | Yes |
+| `_2.xlsx` | `cons_abat_oliba` | 30.0 | 3.92 | 2.033 | Borderline high |
+| `_1.xlsx` | `cons_abat_marcet` | 31.7 | 9.31 | 0.926 | Borderline low |
+| `_1.xlsx` | `cons_abat_garriga` | 12.7 | 8.84 | 0.365 | No |
+| `_2.xlsx` | `cons_hostatgeria_underfloor_hea` | 10.9 | 32.46 | 0.0818 | No |
+| `_2.xlsx` | `cons_nostra_senyora` | 1.0 | 9.77 | 0.0214 | No |
 
 ### 2.4 Interpretation
 
-This does **not** support one single clean answer for all sheets.
+This does **not** support one single clean flow interpretation across all sheets, even under the fixed `kW` assumption.
 
 Observations:
 
-1. For `cons_abat_oliba`, assuming `kW` gives a median derived flow of about `2.03`, which is already close to the supervisor's expected `1-2` range.
-2. For `cons_hostatgeria_DHW_radiators`, assuming `kW` gives about `1.41`, also close to the expected range.
-3. For `cons_hostatgeria_underfloor_hea`, assuming `kW` gives only about `0.082`.
-4. For `cons_nostra_senyora`, assuming `kW` gives only about `0.021`.
+1. `cons_hostatgeria_DHW_radiators` and `cons_abat_cisneros` fit the `kW` assumption well.
+2. `cons_abat_oliba` is close, but slightly high.
+3. `cons_abat_marcet` is below the expected range, but not wildly so.
+4. `cons_abat_garriga`, `cons_hostatgeria_underfloor_hea`, and `cons_nostra_senyora` are clearly inconsistent with the simple `kW` interpretation.
 
 So the situation is probably one of these:
 
@@ -70,7 +87,7 @@ So the situation is probably one of these:
 
 Working conclusion:
 
-`kW` is still plausible for at least some sheets, but the derived-flow interpretation is not yet validated across the whole dataset.
+`kW` is now the assumed power unit for all sheets, based on supervisor guidance, but the derived-flow interpretation is not validated consistently across the full set of heating-consumer sheets.
 
 ## 3. Clustering results
 
@@ -426,9 +443,9 @@ So the best current role assignment is:
 
 Current conclusions after this iteration:
 
-1. The power unit / flow interpretation remains unresolved globally.
-2. The `kW` assumption still looks plausible for `cons_abat_oliba` and `cons_hostatgeria_DHW_radiators`.
-3. The same assumption does not look equally plausible for `cons_hostatgeria_underfloor_hea` and `cons_nostra_senyora`.
+1. The power unit is now assumed to be `kW` for all sheets, based on supervisor guidance.
+2. The flow interpretation remains unresolved globally even under that fixed `kW` assumption.
+3. Some sheets fit the resulting expected flow range much better than others.
 4. Time-window clustering is now implemented and producing interpretable structure.
 5. `cons_hostatgeria_underfloor_hea` remains the strongest primary case study.
 6. Clustering supports the idea that its anomalies correspond to windows that leave its dominant normal regime.
@@ -460,7 +477,7 @@ Current conclusions after this iteration:
 
 If the supervisor agrees with the direction, the next steps should be:
 
-1. Confirm or narrow the power unit / scaling interpretation.
+1. Keep the `kW` assumption fixed and investigate why the same flow formula behaves differently across sheets.
 2. Keep `cons_hostatgeria_underfloor_hea` as the primary case.
 3. Use clustering as a supporting analysis for operating-regime interpretation.
 4. Compare `24h` windows with `12h` windows to test whether shorter windows improve sensitivity without making interpretation worse.

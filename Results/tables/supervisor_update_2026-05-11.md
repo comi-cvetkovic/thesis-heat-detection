@@ -162,7 +162,7 @@ What cannot yet be claimed:
 
 - These anomalies are confirmed physical faults.
 - The best flow formulation is finalized.
-- The power units and flow interpretation are fully validated for all sheets.
+- The derived-flow interpretation is fully validated for all sheets, even if power is treated as `kW`.
 
 So the current status is:
 
@@ -658,7 +658,7 @@ These are the most useful questions for the next meeting.
 
 If the supervisor agrees with the current direction, the next tasks should be:
 
-1. Confirm power units and flow interpretation.
+1. Keep the `kW` assumption fixed and clarify why the same flow formula behaves differently across sheets.
 2. Choose one primary thesis case:
    - likely `cons_hostatgeria_underfloor_hea`
 3. Keep one secondary comparison case:
