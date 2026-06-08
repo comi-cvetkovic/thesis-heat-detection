@@ -7,7 +7,7 @@ window_start,reconstruction_mse,is_reconstruction_anomaly,split,supply_temp_c_re
 2024-01-06 06:45:00,0.36147398,False,train,0.27171734,False,0.17281817,False,0.6398864,False,stabilized_flow_log_feature
 2024-01-06 18:45:00,0.42689666,False,train,0.33725968,False,0.22376525,False,0.719665,False,stabilized_flow_log_feature
 2024-01-07 06:45:00,0.7403724,False,train,0.8431316,False,0.28330162,False,1.0946841,False,stabilized_flow_log_feature
-2024-01-07 18:45:00,1.3795352,False,train,2.350894,False,0.39346015,False,1.394252,False,supply_temp_c
+2024-01-07 18:45:00,1.3795352,False,train,2.350894,False,0.39346015,False,1.394252,True,supply_temp_c
 2024-01-08 06:45:00,1.0982438,False,train,1.9121348,False,0.3068919,False,1.0757046,False,supply_temp_c
 2024-01-08 18:45:00,0.558897,False,train,0.70317006,False,0.19462848,False,0.7788923,False,stabilized_flow_log_feature
 2024-01-09 06:45:00,0.50729156,False,train,0.6344206,False,0.17535931,False,0.71209496,False,stabilized_flow_log_feature
@@ -20,7 +20,7 @@ window_start,reconstruction_mse,is_reconstruction_anomaly,split,supply_temp_c_re
 2024-01-12 18:45:00,0.4110757,False,train,0.35036626,False,0.1824162,False,0.70044446,False,stabilized_flow_log_feature
 2024-01-13 06:45:00,0.44417804,False,train,0.3980365,False,0.19753905,False,0.73695856,False,stabilized_flow_log_feature
 2024-01-13 18:45:00,0.989095,False,train,1.1551718,False,0.28822887,False,1.5238843,True,stabilized_flow_log_feature
-2024-01-14 06:45:00,0.9845739,False,train,1.1962953,False,0.34194884,False,1.4154774,False,stabilized_flow_log_feature
+2024-01-14 06:45:00,0.9845739,False,train,1.1962953,False,0.34194884,False,1.4154774,True,stabilized_flow_log_feature
 2024-01-14 18:45:00,0.41108713,False,train,0.42840028,False,0.26004565,False,0.5448154,False,stabilized_flow_log_feature
 2024-01-15 06:45:00,0.47585428,False,train,0.59564525,False,0.33224133,False,0.49967608,False,supply_temp_c
 2024-01-15 18:45:00,0.61309046,False,train,0.7047844,False,0.49004114,False,0.6444457,False,supply_temp_c
@@ -118,7 +118,7 @@ window_start,reconstruction_mse,is_reconstruction_anomaly,split,supply_temp_c_re
 2024-03-01 18:45:00,0.98765534,False,train,2.1192415,False,0.50413984,False,0.33958486,False,supply_temp_c
 2024-03-02 06:45:00,1.0383668,False,train,2.3904078,False,0.3843925,False,0.34029976,False,supply_temp_c
 2024-03-02 18:45:00,1.0360051,False,train,1.5906438,False,0.39302477,False,1.1243469,False,supply_temp_c
-2024-03-03 06:45:00,1.0268943,False,train,1.3013033,False,0.34581494,False,1.4335648,False,stabilized_flow_log_feature
+2024-03-03 06:45:00,1.0268943,False,train,1.3013033,False,0.34581494,False,1.4335648,True,stabilized_flow_log_feature
 2024-03-03 18:45:00,0.65950036,False,train,0.67526674,False,0.31998166,False,0.98325276,False,stabilized_flow_log_feature
 2024-03-04 06:45:00,0.7794567,False,train,1.040751,False,0.37751237,False,0.92010635,False,supply_temp_c
 2024-03-04 18:45:00,0.94975686,False,train,1.4678679,False,0.27863604,False,1.1027666,False,supply_temp_c
@@ -131,9 +131,9 @@ window_start,reconstruction_mse,is_reconstruction_anomaly,split,supply_temp_c_re
 2024-03-08 06:45:00,0.3844277,False,train,0.4116933,False,0.28992411,False,0.45166576,False,stabilized_flow_log_feature
 2024-03-08 18:45:00,0.7646831,False,train,1.3392693,False,0.31059325,False,0.6441869,False,supply_temp_c
 2024-03-09 06:45:00,0.8502701,False,train,1.5492296,False,0.33421436,False,0.6673663,False,supply_temp_c
-2024-03-09 18:45:00,1.5161186,False,train,2.6577017,False,0.4421699,False,1.4484848,False,supply_temp_c
-2024-03-10 06:45:00,1.9127584,False,train,3.3410156,False,0.517573,False,1.8796864,True,supply_temp_c
-2024-03-10 18:45:00,1.0843222,False,train,1.6191317,False,0.35382643,False,1.2800084,False,supply_temp_c
+2024-03-09 18:45:00,1.5161186,False,train,2.6577017,False,0.4421699,False,1.4484848,True,supply_temp_c
+2024-03-10 06:45:00,1.9127584,True,train,3.3410156,True,0.517573,False,1.8796864,True,supply_temp_c
+2024-03-10 18:45:00,1.0843222,False,train,1.6191317,False,0.35382643,False,1.2800084,True,supply_temp_c
 2024-03-11 06:45:00,0.64758354,False,train,0.87588996,False,0.27077878,False,0.79608184,False,supply_temp_c
 2024-03-11 18:45:00,0.37539154,False,train,0.46010637,False,0.28880218,False,0.37726602,False,supply_temp_c
 2024-03-12 06:45:00,0.37647507,False,train,0.4696013,False,0.3387243,False,0.32109955,False,supply_temp_c
@@ -198,7 +198,7 @@ window_start,reconstruction_mse,is_reconstruction_anomaly,split,supply_temp_c_re
 2024-04-14 06:45:00,0.4360953,False,train,0.28310338,False,0.7522545,False,0.27292803,False,return_temp_c
 2024-04-14 18:45:00,0.46382284,False,train,0.25994232,False,0.8637727,False,0.2677535,False,return_temp_c
 2024-04-15 06:45:00,0.51214427,False,train,0.31599143,False,0.94565874,False,0.2747824,False,return_temp_c
-2024-04-15 18:45:00,0.62086535,False,train,0.32165423,False,1.2827652,False,0.25817665,False,return_temp_c
+2024-04-15 18:45:00,0.62086535,False,train,0.32165423,False,1.2827652,True,0.25817665,False,return_temp_c
 2024-04-17 06:45:00,0.48332903,False,train,0.28877085,False,0.66911274,False,0.49210343,False,return_temp_c
 2024-04-17 18:45:00,0.4477257,False,train,0.38788342,False,0.68708515,False,0.26820862,False,return_temp_c
 2024-04-19 06:45:00,0.44159958,False,train,0.25812772,False,0.8277462,False,0.2389248,False,return_temp_c

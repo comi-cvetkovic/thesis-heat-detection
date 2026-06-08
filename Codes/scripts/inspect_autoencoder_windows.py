@@ -31,6 +31,15 @@ from Codes.scripts.prepare_autoencoder_windows import (
 from Codes.src.features import add_delta_t
 
 
+DISPLAY_LABELS = {
+    "supply_temp_c": "Supply [deg C]",
+    "return_temp_c": "Return [deg C]",
+    "derived_flow_kg_s": "Flow [kg/s]",
+    "stabilized_flow_log_feature": "Stabilized flow [a.u.]",
+    "delta_t_c": "Delta-T [deg C]",
+}
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sheet", default="cons_hostatgeria_underfloor_hea")
@@ -132,16 +141,16 @@ def main() -> None:
 
         fig, axes = plt.subplots(4, 1, figsize=(12, 9), sharex=True)
         axes[0].plot(window_features.index, window_features["supply_temp_c"], linewidth=0.8)
-        axes[0].set_ylabel("Supply C")
+        axes[0].set_ylabel(DISPLAY_LABELS["supply_temp_c"])
         axes[1].plot(window_features.index, window_features["return_temp_c"], linewidth=0.8, color="tab:green")
-        axes[1].set_ylabel("Return C")
+        axes[1].set_ylabel(DISPLAY_LABELS["return_temp_c"])
         axes[2].plot(window_features.index, window_features[flow_feature_name], linewidth=0.8, color="tab:purple")
-        axes[2].set_ylabel(flow_feature_name)
+        axes[2].set_ylabel(DISPLAY_LABELS.get(flow_feature_name, flow_feature_name))
         axes[3].plot(window_baseline.index, window_baseline["delta_t_c"], linewidth=0.8, color="tab:orange")
         overlapping = window_baseline[window_baseline["is_low_delta_t_anomaly"].fillna(False)]
         if not overlapping.empty:
             axes[3].scatter(overlapping.index, overlapping["delta_t_c"], s=15, color="tab:red")
-        axes[3].set_ylabel("Delta-T C")
+        axes[3].set_ylabel(DISPLAY_LABELS["delta_t_c"])
         axes[3].set_xlabel("Timestamp")
         fig.suptitle(
             f"{args.sheet} window {rank}: {start:%Y-%m-%d %H:%M} mse={row.reconstruction_mse:.3f}",

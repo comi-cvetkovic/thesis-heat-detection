@@ -1,6 +1,7 @@
 anomaly_cluster,dominant_anomalous_feature,windows
-0,supply_temp_c,3
-1,return_temp_c,9
-1,supply_temp_c,2
-1,stabilized_flow_log_feature,1
+0,stabilized_flow_log_feature,48
+0,return_temp_c,1
+1,return_temp_c,28
+1,stabilized_flow_log_feature,19
+1,supply_temp_c,9
 2,return_temp_c,1

@@ -1,4 +1,12 @@
 sheet,anomaly_cluster,windows,dominant_feature_mode,reconstruction_mse_median
-cons_abat_oliba,1,12,return_temp_c,0.324526745
-cons_hostatgeria_underfloor_hea,0,3,supply_temp_c,2.3978107
+cons_abat_cisneros,1,4,stabilized_flow_log_feature,0.33577761
+cons_abat_garriga,0,6,stabilized_flow_log_feature,0.31641544499999996
+cons_abat_garriga,1,11,return_temp_c,0.37915444
+cons_abat_marcet,0,1,stabilized_flow_log_feature,0.97991776
+cons_abat_marcet,1,9,stabilized_flow_log_feature,0.51242304
+cons_abat_oliba,1,2,return_temp_c,0.38343061
+cons_hostatgeria_DHW_radiators,0,42,stabilized_flow_log_feature,0.48109081
+cons_hostatgeria_DHW_radiators,1,8,return_temp_c,0.450420365
+cons_hostatgeria_underfloor_hea,1,4,supply_temp_c,2.3223153500000002
 cons_hostatgeria_underfloor_hea,2,1,return_temp_c,2.8034685
+cons_nostra_senyora,1,18,return_temp_c,0.46361024500000003

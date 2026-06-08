@@ -38,6 +38,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--learning-rate", type=float, default=1e-3)
     parser.add_argument("--train-fraction", type=float, default=0.8)
     parser.add_argument(
+        "--threshold-method",
+        choices=["train_p99", "train_3sigma"],
+        default="train_3sigma",
+        help="How to convert training reconstruction errors into anomaly thresholds.",
+    )
+    parser.add_argument(
         "--feature-name",
         default=None,
         help="Optional single feature to train as a univariate autoencoder. Defaults to joint multivariate training.",
@@ -114,12 +120,23 @@ def main() -> None:
         print(f"epoch={epoch} train_loss={history[-1]['train_loss']:.6f}")
 
     errors, channel_errors = reconstruction_errors(model, all_windows, args.batch_size)
-    threshold = float(np.quantile(errors[:split_index], 0.99))
+    train_errors = errors[:split_index]
+    if args.threshold_method == "train_p99":
+        threshold = float(np.quantile(train_errors, 0.99))
+    elif args.threshold_method == "train_3sigma":
+        threshold = float(train_errors.mean() + 3.0 * train_errors.std(ddof=0))
+    else:
+        raise ValueError(f"Unsupported threshold method: {args.threshold_method}")
     anomaly_flags = errors > threshold
-    channel_thresholds = {
-        feature_name: float(np.quantile(channel_errors[:split_index, index], 0.99))
-        for index, feature_name in enumerate(feature_names)
-    }
+    channel_thresholds: dict[str, float] = {}
+    for index, feature_name in enumerate(feature_names):
+        train_channel_errors = channel_errors[:split_index, index]
+        if args.threshold_method == "train_p99":
+            channel_thresholds[feature_name] = float(np.quantile(train_channel_errors, 0.99))
+        else:
+            channel_thresholds[feature_name] = float(
+                train_channel_errors.mean() + 3.0 * train_channel_errors.std(ddof=0)
+            )
 
     args.models_dir.mkdir(parents=True, exist_ok=True)
     args.tables_dir.mkdir(parents=True, exist_ok=True)
@@ -138,7 +155,9 @@ def main() -> None:
             "stds": data["stds"],
             "flow_feature_mode": flow_feature_mode,
             "model_scope": model_scope,
-            "threshold_train_p99": threshold,
+            "threshold_method": args.threshold_method,
+            "threshold_value": threshold,
+            "channel_thresholds": channel_thresholds,
             "windows_path": str(args.windows),
         },
         model_path,
@@ -174,8 +193,9 @@ def main() -> None:
                 "features": ", ".join(feature_names),
                 "model_scope": model_scope,
                 "flow_feature_mode": flow_feature_mode,
-                "threshold_train_p99": threshold,
-                **{f"{name}_threshold_train_p99": channel_thresholds[name] for name in feature_names},
+                "threshold_method": args.threshold_method,
+                "threshold_value": threshold,
+                **{f"{name}_threshold_value": channel_thresholds[name] for name in feature_names},
                 "flagged_windows": int(anomaly_flags.sum()),
                 "model_path": model_path,
                 "scores_path": scores_path,
@@ -194,7 +214,8 @@ def main() -> None:
         color="tab:red",
         label="Flagged window",
     )
-    axis.axhline(threshold, color="tab:orange", linestyle="--", linewidth=1.0, label="Train p99 threshold")
+    threshold_label = "Train p99 threshold" if args.threshold_method == "train_p99" else "Train mean + 3 sigma"
+    axis.axhline(threshold, color="tab:orange", linestyle="--", linewidth=1.0, label=threshold_label)
     axis.set_title(f"Autoencoder reconstruction error: {stem}")
     axis.set_xlabel("Window start")
     axis.set_ylabel("MSE on normalized channels")

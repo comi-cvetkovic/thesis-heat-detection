@@ -1,0 +1,16 @@
+sheet,feature_type,windows,reconstruction_mse_median
+cons_abat_cisneros,Flow,4,0.33577761
+cons_abat_garriga,Flow,6,0.300354345
+cons_abat_garriga,Return,11,0.37915444
+cons_abat_marcet,Flow,8,0.6428096000000001
+cons_abat_marcet,Return,2,0.72044453
+cons_abat_oliba,Return,1,0.38521242
+cons_abat_oliba,Supply,1,0.3816488
+cons_hostatgeria_DHW_radiators,Flow,45,0.47406694
+cons_hostatgeria_DHW_radiators,Return,3,0.5583097
+cons_hostatgeria_DHW_radiators,Supply,2,0.457417575
+cons_hostatgeria_underfloor_hea,Return,1,2.8034685
+cons_hostatgeria_underfloor_hea,Supply,4,2.3223153500000002
+cons_nostra_senyora,Flow,4,0.601594685
+cons_nostra_senyora,Return,12,0.42814394
+cons_nostra_senyora,Supply,2,0.7019261

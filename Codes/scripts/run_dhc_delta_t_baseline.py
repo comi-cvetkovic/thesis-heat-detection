@@ -21,6 +21,9 @@ from Codes.src.features import add_delta_t
 
 
 DEFAULT_TARGETS = {
+    "cons_abat_cisneros": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_1.xlsx",
+    "cons_abat_garriga": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_1.xlsx",
+    "cons_abat_marcet": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_1.xlsx",
     "cons_abat_oliba": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_2.xlsx",
     "cons_hostatgeria_DHW_radiators": ROOT
     / "Data"

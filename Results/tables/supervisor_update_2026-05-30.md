@@ -31,8 +31,11 @@ The current project pipeline is:
    - inspect the three signals directly in the top flagged windows
    - use clustering either on all windows or only on the detected anomaly windows
 
-The main consumer sheets used so far are:
+The main heating-consumer sheets now modeled end to end are:
 
+- `cons_abat_cisneros`
+- `cons_abat_garriga`
+- `cons_abat_marcet`
 - `cons_abat_oliba`
 - `cons_hostatgeria_underfloor_hea`
 - `cons_hostatgeria_DHW_radiators`
@@ -304,7 +307,60 @@ Important finding:
 
 That suggests the autoencoder is not only rediscovering the simple baseline.
 
-## 9.1 Evaluation workflow used at the current stage
+## 9.1 Cross-building comparison
+
+The current cross-building comparison is now based on the **seven heating-consumer sheets** above, using the **joint stabilized-flow autoencoder** as the common comparison lens.
+
+The current cross-building comparison table is:
+
+- [all_buildings_result_summary.csv](</D:/Downloads/KTH/Masters Thesis/thesis-heat-detection/Results/tables/all_buildings_result_summary.csv>)
+
+Key counts:
+
+| Sheet | Retained windows | Flagged windows | Flagged rate | Low delta-T baseline anomalies | Top reviewed overlap? |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `cons_abat_cisneros` | 1113 | 9 | 0.81% | 0 | No |
+| `cons_abat_garriga` | 1107 | 9 | 0.81% | 0 | No |
+| `cons_abat_marcet` | 951 | 8 | 0.84% | 0 | No |
+| `cons_abat_oliba` | 955 | 12 | 1.26% | 0 | No |
+| `cons_hostatgeria_DHW_radiators` | 1075 | 29 | 2.70% | 0 | No |
+| `cons_hostatgeria_underfloor_hea` | 323 | 4 | 1.24% | 940 | Yes |
+| `cons_nostra_senyora` | 1111 | 9 | 0.81% | 0 | No |
+
+Cross-building reconstruction-error comparison:
+
+![All buildings reconstruction error comparison](../figures/all_buildings_reconstruction_error_grid.png)
+
+Cross-building anomaly-count comparison:
+
+![All buildings anomaly summary](../figures/all_buildings_anomaly_summary.png)
+
+Cross-building baseline-vs-autoencoder comparison:
+
+![All buildings baseline vs autoencoder](../figures/all_buildings_baseline_vs_autoencoder.png)
+
+Top inspected anomaly window from each sheet:
+
+![All buildings top anomaly windows](../figures/all_buildings_top_anomaly_grid.png)
+
+Interpretation:
+
+- the three additional Abat sheets from `_1.xlsx` now produce full comparable anomaly outputs and should be treated as part of the main modeled dataset rather than only as inventory candidates
+- `cons_hostatgeria_DHW_radiators` has the largest flagged-window count under the stabilized-flow lens, but its top reviewed anomalies still do not overlap the strict low delta-T baseline
+- `cons_hostatgeria_underfloor_hea` has fewer flagged windows, but it remains the most physically interpretable case because several top windows overlap the low delta-T baseline
+- `cons_abat_oliba` remains important, but the stabilized lens moves it away from obvious raw-flow blow-up behavior and toward a more return-temperature-driven interpretation
+- `cons_abat_cisneros` and `cons_abat_marcet` remain mostly stabilized-flow-driven in their top anomaly windows
+- `cons_abat_garriga` becomes more return-temperature-driven under the stabilized lens
+- `cons_nostra_senyora` has a nontrivial anomaly set, but the interpretation remains weaker than underfloor heating and Abat Oliba because the top reviewed windows do not overlap the low delta-T baseline
+
+The current practical ranking is:
+
+1. `cons_hostatgeria_underfloor_hea` as the main case study
+2. `cons_abat_oliba` as the secondary case
+3. `cons_hostatgeria_DHW_radiators` as a large anomaly-count comparative case
+4. `cons_abat_cisneros`, `cons_abat_garriga`, `cons_abat_marcet`, and `cons_nostra_senyora` as additional modeled comparative cases with weaker or more flow-dominated interpretation so far
+
+## 9.2 Evaluation workflow used at the current stage
 
 Because labeled fault data is not yet available, the current evaluation is based on structured anomaly review rather than formal classification metrics.
 
@@ -400,12 +456,21 @@ Purpose:
 - identify operating regimes
 - see whether anomalies fall inside or outside dominant normal regimes
 
-The main figure is:
+Cross-building cluster-distribution figure:
+
+![All buildings window cluster distribution](../figures/all_buildings_window_cluster_distribution.png)
+
+PCA visualization used during exploration:
 
 ![Window clustering PCA](../figures/cluster_pca_scatter_stabilized_log.png)
 
 Interpretation:
 
+- the stacked bar figure is the better cross-building summary because it shows how strongly each sheet is dominated by one or two operating-regime clusters
+- the seven-sheet view confirms that cluster occupancy is highly uneven across buildings, so the clustering is not simply splitting the windows evenly
+- underfloor heating is almost entirely concentrated in one cluster, which matches the idea of a strong dominant operating regime
+- the added Abat sheets also show strong concentration in one or two operating-regime clusters rather than even use of all four clusters
+- DHW radiators and Nostra Senyora also show skewed cluster occupancy rather than even use of all clusters
 - each point = one 24-hour window
 - color = cluster
 - outlined points = autoencoder anomalies
@@ -448,7 +513,11 @@ This is implemented in:
 
 - [cluster_detected_anomalies.py](</D:/Downloads/KTH/Masters Thesis/thesis-heat-detection/Codes/scripts/cluster_detected_anomalies.py>)
 
-Main figure:
+Cross-building anomaly-cluster distribution:
+
+![All buildings anomaly cluster distribution](../figures/all_buildings_anomaly_cluster_distribution.png)
+
+Exploratory PCA view of anomaly clustering:
 
 ![Detected anomaly clustering](../figures/anomaly_cluster_pca_scatter_stabilized_log.png)
 
@@ -458,32 +527,67 @@ Direct feature-interpretation figures:
 
 ![Anomaly cluster median per-feature reconstruction error](../figures/anomaly_cluster_feature_mse_stabilized_log.png)
 
+![Anomaly cluster feature heatmap](../figures/anomaly_cluster_feature_heatmap_stabilized_log.png)
+
+Cleaner direct feature-type grouping:
+
+![Anomaly windows by dominant feature](../figures/anomaly_feature_type_counts_stabilized_log.png)
+
+![Median per-feature error within feature-type groups](../figures/anomaly_feature_type_median_mse_stabilized_log.png)
+
+![Dominant anomaly feature by sheet](../figures/anomaly_feature_type_by_sheet_stabilized_log.png)
+
+Representative anomaly windows for the three current anomaly clusters:
+
+![Representative anomaly cluster 0 window](../figures/inspect_autoencoder_cons_abat_cisneros_stabilized_log_01.png)
+
+![Representative anomaly cluster 1 window](../figures/inspect_autoencoder_cons_abat_marcet_stabilized_log_01.png)
+
+![Representative anomaly cluster 2 window](../figures/inspect_autoencoder_cons_hostatgeria_underfloor_hea_stabilized_log_02.png)
+
 Current result:
 
-- one anomaly cluster is mainly `cons_abat_oliba` and mostly return-temperature-driven
-- one anomaly cluster is mainly underfloor-heating and supply-temperature-driven
+- one large anomaly cluster contains windows from six of the seven sheets and is mostly stabilized-flow-driven
+- one medium anomaly cluster contains a mix of underfloor heating, Garriga, Marcet, and Nostra Senyora windows and is still mainly stabilized-flow-driven
 - one small separate cluster contains the distinctive underfloor-heating return-temperature anomaly
+- unlike the earlier four-sheet result, the seven-sheet stabilized anomaly clustering is no longer sparse: all sheets except `cons_hostatgeria_underfloor_hea` contribute mainly to the large flow-dominated anomaly cluster, while underfloor heating still creates the most distinctive separate anomaly behavior
 
 This gives a useful interpretation:
 
 ```text
-the anomalies are not one mixed set; they already separate into recurring anomaly families
+the anomalies are not one mixed set; they separate into a broad stabilized-flow-driven family plus a smaller set of more distinctive underfloor-heating and return-temperature-driven cases
 ```
 
 Important clarification:
 
-- the PCA scatter is only a similarity visualization
+- the PCA scatter is only a similarity visualization and should not be the main interpretation figure
 - `PCA 1` and `PCA 2` do not mean supply / return / flow directly
 - the two new feature plots above are the direct answer to:
   - which anomaly clusters are mainly supply-driven?
   - which are mainly return-driven?
   - whether any are mainly flow-driven?
+- the three new feature-type figures are even more direct than clustering when the supervisor wants anomalies grouped simply as supply / return / flow related
+- the heatmap and representative-window figures are more physically interpretable than the PCA projection
 
 The strongest current anomaly-cluster interpretation is:
 
-- cluster `0`: mainly underfloor-heating supply-temperature anomalies
-- cluster `1`: mainly Abat Oliba return-temperature anomalies
+- cluster `0`: the broad cross-building stabilized-flow anomaly family
+- cluster `1`: a smaller mixed anomaly family with underfloor-heating, Garriga, Marcet, and Nostra Senyora contributions
 - cluster `2`: one distinctive underfloor-heating return-temperature anomaly
+
+Direct feature-type interpretation of the seven-sheet stabilized anomaly set:
+
+- `Flow`-dominant anomalies: `49` windows
+- `Return`-dominant anomalies: `23` windows
+- `Supply`-dominant anomalies: `8` windows
+
+So the cleanest answer to "what feature is the anomaly in?" is currently:
+
+```text
+most anomalies are flow-dominant,
+a smaller set are return-dominant,
+and only a few are supply-dominant
+```
 
 ## 16. How this compares with the HEAT paper
 
@@ -530,15 +634,15 @@ The new anomaly clustering is a useful extension and probably closer to the supe
 
 ## 17. Best current conclusions
 
-1. The reconstruction-based anomaly pipeline works end to end.
-2. `cons_hostatgeria_underfloor_hea` remains the strongest case study.
-3. `cons_abat_oliba` remains useful, especially with stabilized flow.
-4. The per-feature anomaly interpretation is now much stronger than before.
+1. The reconstruction-based anomaly pipeline now works end to end on seven heating-consumer sheets.
+2. `cons_hostatgeria_underfloor_hea` remains the strongest case study because it is still the clearest bridge between autoencoder anomalies and the engineering low delta-T baseline.
+3. `cons_abat_oliba` remains useful, especially with stabilized flow, but it is no longer the only secondary case because the `_1.xlsx` Abat sheets now also produce full comparable outputs.
+4. The per-feature anomaly interpretation is much stronger than before, but many of the added-sheet anomalies are still dominated by the flow-derived channel rather than by clear supply or return effects.
 5. The power column is now assumed to be `kW` for all sheets, based on supervisor guidance.
 6. Even under that fixed `kW` assumption, the derived-flow interpretation is not consistently validated across all heating-consumer sheets.
-7. Feature-space clustering of all windows is useful for operating-regime interpretation.
-8. Clustering only the detected anomalies is useful for grouping anomaly families.
-9. The anomaly-only clustering is likely closer to the supervisor's recent request.
+7. Feature-space clustering of all windows is useful for operating-regime interpretation across the seven-sheet set.
+8. Clustering only the detected anomalies is useful for grouping anomaly families, but at the seven-sheet stabilized level it currently produces one broad flow-dominated anomaly family plus only a small number of more distinctive anomaly groups.
+9. The anomaly-only clustering is still likely closer to the supervisor's recent request than the earlier all-window clustering-only interpretation.
 10. The HEAT paper should still be used as the methodological reference, but our current anomaly-clustering step should be presented as an adaptation, not a direct reproduction of HEAT.
 
 ## 18. Recommended next step
@@ -550,7 +654,8 @@ Should clustering be used mainly in the HEAT sense (peer-group creation before f
 or mainly in the anomaly-grouping sense (cluster the detected anomaly windows into anomaly types)?
 ```
 
-If the answer is “both”, then the thesis can present:
+If the answer is "both", then the thesis can present:
 
 1. HEAT-inspired peer-group clustering as the paper-aligned method
 2. anomaly-only clustering as a practical adaptation for the smaller dataset
+

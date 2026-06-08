@@ -1,0 +1,8 @@
+sheet,display_label,windows,train_windows,threshold_p99,threshold_3sigma,flagged_p99,flagged_3sigma,delta_flagged_windows
+cons_abat_cisneros,Abat Cisneros,1113,890,0.274143983,0.312167435,9,4,-5
+cons_abat_garriga,Abat Garriga,1107,885,0.318436964,0.279670996,9,17,8
+cons_abat_marcet,Abat Marcet,951,760,0.429558634,0.400416313,8,10,2
+cons_abat_oliba,Abat Oliba,955,764,0.308094575,0.341704048,12,2,-10
+cons_hostatgeria_dhw_radiators,Hostatgeria DHW Radiators,1075,860,0.459616232,0.355834848,29,50,21
+cons_hostatgeria_underfloor_hea,Hostatgeria Underfloor,323,258,2.056404888,1.538823522,4,5,1
+cons_nostra_senyora,Nostra Senyora,1111,888,0.451765601,0.366076136,9,18,9

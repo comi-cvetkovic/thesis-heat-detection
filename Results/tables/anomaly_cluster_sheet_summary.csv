@@ -1,0 +1,9 @@
+sheet,anomaly_cluster,windows,dominant_feature_mode,reconstruction_mse_median
+cons_abat_cisneros,0,9,derived_flow_kg_s,0.7317794
+cons_abat_garriga,0,9,derived_flow_kg_s,0.88857776
+cons_abat_marcet,0,10,derived_flow_kg_s,2.65186645
+cons_abat_oliba,2,8,derived_flow_kg_s,5.7641143
+cons_hostatgeria_DHW_radiators,0,13,derived_flow_kg_s,0.51591337
+cons_hostatgeria_underfloor_hea,0,3,supply_temp_c,2.6582835
+cons_hostatgeria_underfloor_hea,1,1,return_temp_c,2.8094702
+cons_nostra_senyora,0,9,derived_flow_kg_s,1.8777593

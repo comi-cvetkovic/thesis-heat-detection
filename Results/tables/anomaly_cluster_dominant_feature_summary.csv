@@ -1,0 +1,6 @@
+anomaly_cluster,dominant_anomalous_feature,windows
+0,derived_flow_kg_s,44
+0,supply_temp_c,6
+0,return_temp_c,3
+1,return_temp_c,1
+2,derived_flow_kg_s,8

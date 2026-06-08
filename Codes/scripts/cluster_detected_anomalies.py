@@ -20,15 +20,19 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from Codes.scripts.prepare_autoencoder_windows import DEFAULT_WORKBOOK, load_feature_frame, make_windows
+from Codes.scripts.prepare_autoencoder_windows import load_feature_frame, make_windows
 
 
-DEFAULT_SHEETS = (
-    "cons_abat_oliba",
-    "cons_hostatgeria_underfloor_hea",
-    "cons_hostatgeria_DHW_radiators",
-    "cons_nostra_senyora",
-)
+DEFAULT_TARGETS = {
+    "cons_abat_cisneros": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_1.xlsx",
+    "cons_abat_garriga": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_1.xlsx",
+    "cons_abat_marcet": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_1.xlsx",
+    "cons_abat_oliba": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_2.xlsx",
+    "cons_hostatgeria_underfloor_hea": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_2.xlsx",
+    "cons_hostatgeria_DHW_radiators": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_2.xlsx",
+    "cons_nostra_senyora": ROOT / "Data" / "DHC network" / "data" / "District Heating_updated_16_07_2025_2.xlsx",
+}
+DEFAULT_SHEETS = tuple(DEFAULT_TARGETS)
 
 
 def clean_name(value: str) -> str:
@@ -37,7 +41,7 @@ def clean_name(value: str) -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--workbook", type=Path, default=DEFAULT_WORKBOOK)
+    parser.add_argument("--workbook", type=Path, default=None)
     parser.add_argument("--sheets", nargs="+", default=list(DEFAULT_SHEETS))
     parser.add_argument("--resample-interval", default="15min")
     parser.add_argument("--window-hours", type=int, default=24)
@@ -60,8 +64,9 @@ def build_anomaly_rows(args: argparse.Namespace) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
 
     for sheet in args.sheets:
+        workbook = args.workbook if args.workbook is not None else DEFAULT_TARGETS[sheet]
         feature_frame, feature_columns = load_feature_frame(
-            args.workbook,
+            workbook,
             sheet,
             args.resample_interval,
             args.flow_feature_mode,

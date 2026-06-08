@@ -1,0 +1,4 @@
+anomaly_cluster,windows,sheets,dominant_feature_mode,reconstruction_mse_median,supply_median,return_median,flow_median,delta_t_median,delta_t_min
+0,53,"cons_abat_cisneros, cons_abat_garriga, cons_abat_marcet, cons_hostatgeria_DHW_radiators, cons_hostatgeria_underfloor_hea, cons_nostra_senyora",derived_flow_kg_s,1.2470294,75.30500030517578,67.01000213623047,1.483336091041565,7.555427551269531,0.26000213623046875
+1,1,cons_hostatgeria_underfloor_hea,return_temp_c,2.8094702,78.4715347290039,30.100000381469727,0.0037530651316046715,47.75,35.01000213623047
+2,8,cons_abat_oliba,derived_flow_kg_s,5.7641143,78.77999877929688,77.14500045776367,6.120389461517334,0.24499893188476562,0.01000213623046875

@@ -42,7 +42,9 @@ def main() -> None:
 
     scores = pd.read_csv(scores_path, parse_dates=["window_start"]).sort_values("window_start").reset_index(drop=True)
     summary = pd.read_csv(summary_path).iloc[0]
-    threshold = float(summary["threshold_train_p99"])
+    threshold = float(summary["threshold_value"]) if "threshold_value" in summary.index else float(summary["threshold_train_p99"])
+    threshold_method = str(summary["threshold_method"]) if "threshold_method" in summary.index else "train_p99"
+    threshold_label = "Train mean + 3 sigma" if threshold_method == "train_3sigma" else "Train p99 threshold"
 
     # Gap-aware time series: break line where windows are not contiguous enough.
     gap = pd.Timedelta(hours=args.gap_hours)
@@ -70,7 +72,7 @@ def main() -> None:
     axis.plot(gap_plot_df["window_start"], gap_plot_df["reconstruction_mse"], linewidth=1.0, label="Reconstruction MSE")
     flagged = scores[scores["is_reconstruction_anomaly"]]
     axis.scatter(flagged["window_start"], flagged["reconstruction_mse"], s=24, color="tab:red", label="Flagged window")
-    axis.axhline(threshold, color="tab:orange", linestyle="--", linewidth=1.1, label="Train p99 threshold")
+    axis.axhline(threshold, color="tab:orange", linestyle="--", linewidth=1.1, label=threshold_label)
     axis.set_title(f"Gap-aware reconstruction error: {slug}{suffix}")
     axis.set_xlabel("Window start")
     axis.set_ylabel("MSE")
@@ -88,7 +90,7 @@ def main() -> None:
     bins = np.histogram_bin_edges(scores["reconstruction_mse"], bins="auto")
     axis.hist(train, bins=bins, alpha=0.65, label="Train", color="tab:blue")
     axis.hist(test, bins=bins, alpha=0.55, label="Test", color="tab:green")
-    axis.axvline(threshold, color="tab:orange", linestyle="--", linewidth=1.1, label="Train p99 threshold")
+    axis.axvline(threshold, color="tab:orange", linestyle="--", linewidth=1.1, label=threshold_label)
     axis.set_title(f"Reconstruction error distribution: {slug}{suffix}")
     axis.set_xlabel("Reconstruction MSE")
     axis.set_ylabel("Windows")
