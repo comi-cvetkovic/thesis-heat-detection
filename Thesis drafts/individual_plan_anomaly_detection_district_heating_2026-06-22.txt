@@ -10,16 +10,14 @@ Mihailo Cvetkovic
 mihailoc@ug.kth.se
 
 Examiner at KTH:
-TO BE FILLED
+Matthieu Barreau
 
 Supervisor at KTH:
-TO BE FILLED
+Mustapha Habib
 
-External supervisor / assignment provider:
-TO BE FILLED, if applicable
 
 Current date:
-22 June 2026
+22 March 2026
 
 Keywords:
 District heating, anomaly detection, time-series analysis, autoencoder, reconstruction error, clustering, unsupervised learning, energy efficiency
