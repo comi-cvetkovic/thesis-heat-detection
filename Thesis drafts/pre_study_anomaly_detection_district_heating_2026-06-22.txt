@@ -1,0 +1,220 @@
+Pre-study for the degree project
+
+Title:
+Anomaly Detection in District Heating Substations Using Reconstruction-Based Models
+
+Student:
+Mihailo Cvetkovic
+
+Examiner:
+Matthieu Barreau
+
+Supervisor:
+Mustapha Habib
+
+Date:
+22 June 2026
+
+
+1. Introduction
+
+1.1 Background and motivation
+
+District heating systems supply thermal energy to buildings through a shared heat network. Instead of each building producing all heat locally, heat can be generated centrally or recovered from other processes and distributed to consumers through water-based pipe networks. This makes district heating relevant for energy efficiency, system-level flexibility, and the integration of renewable or waste heat sources. As district heating systems become more data-rich, there is increasing potential to use operational measurements for monitoring and fault detection.
+
+District-heating substations operate continuously and generate time-series measurements such as supply temperature, return temperature, flow, and power-related signals. These variables describe how heat is delivered and extracted by a building. Abnormal operating behavior can increase energy use, raise return temperatures, reduce network efficiency, or indicate sensor and control problems. Detecting such abnormal behavior early can support maintenance and operational decision-making.
+
+The difficulty is that real fault labels are often unavailable or incomplete. In a supervised machine-learning setup, a model is trained on examples with known labels, such as normal operation, valve fault, sensor fault, or inefficient heat transfer. The available dataset for this project does not provide a complete set of confirmed fault labels. This means the project cannot be treated as a standard supervised classification problem. Instead, the task is to detect unusual operating windows and make them interpretable enough for review by a supervisor or domain expert.
+
+This motivates an unsupervised anomaly-detection approach. The central idea is to learn what normal or common behavior looks like from historical data and then flag windows that deviate from those learned patterns. In this project, the main model is a reconstruction-based autoencoder. It receives 24-hour windows of district-heating operation, reconstructs those windows, and uses reconstruction error as an anomaly score. If the model has difficulty reconstructing a window, the window is treated as an anomaly candidate.
+
+1.2 Problem statement
+
+The practical problem is to identify abnormal operating periods in a small district-heating dataset without relying on complete fault labels. The method must not only assign an anomaly score, but also support interpretation. A result that only says "this day is anomalous" is not enough for operational use. It should also indicate whether the anomaly is mainly related to supply temperature, return temperature, or flow.
+
+The project is influenced by the HEAT paper, which proposes an encoder-assisted clustering method for fault detection in district-heating substations. HEAT is useful as a methodological reference because it combines learned time-series representations with clustering. However, the available thesis dataset differs from the setting assumed by HEAT. The thesis dataset contains fewer substations but longer historical time coverage. This makes per-building temporal modelling more appropriate than relying mainly on peer-group clustering across a large network.
+
+The problem can therefore be summarized as follows:
+
+How can reconstruction-based unsupervised learning be used to detect and interpret anomalous operating windows in district-heating substations when complete fault labels are not available?
+
+1.3 Aim and objectives
+
+The aim of the degree project is to develop and evaluate an anomaly-detection workflow for district-heating substations using historical operational data. The workflow should be suitable for later application to live data and should produce results that can be reviewed with domain knowledge.
+
+The objectives are:
+
+1. Prepare district-heating time-series data from multiple consumer sheets into consistent model windows.
+2. Train a reconstruction-based model for each usable building or consumer sheet.
+3. Detect anomalous 24-hour windows using reconstruction error.
+4. Compare thresholding methods, especially the 99th percentile rule and the 3-sigma rule.
+5. Attribute each detected anomaly to a dominant feature: supply temperature, return temperature, or flow.
+6. Compare autoencoder anomalies with a simple engineering baseline based on low delta-T.
+7. Investigate clustering as a supporting interpretation method for operating regimes and anomaly families.
+8. Prepare result tables and figures that support qualitative supervisor/domain review.
+
+1.4 Research questions
+
+Main research question:
+
+Can reconstruction-based anomaly detection on supply temperature, return temperature, and flow identify interpretable abnormal operating periods in a small district-heating network?
+
+Supporting research questions:
+
+1. How can 24-hour district-heating windows be prepared so that they are suitable for reconstruction-based modelling?
+2. How does a reconstruction-based detector compare with a simple engineering low delta-T baseline?
+3. How does threshold choice affect the number and type of detected anomalies?
+4. Can dominant-feature attribution make unsupervised anomaly results easier to interpret?
+5. Can clustering provide useful supporting information when the number of substations is small?
+
+1.5 Scope and delimitations
+
+The project is limited to the available historical district-heating data and the later live-data period provided by the supervisor. The work does not aim to build a full production alarm system or an automatic control strategy. It also does not claim confirmed fault classification, because complete labels are not available. The output should be interpreted as anomaly candidates rather than verified faults.
+
+The method focuses on supply temperature, return temperature, and flow. Other potentially useful variables, such as outside temperature, occupancy, operating mode, season, and maintenance records, are not part of the current main model. These variables are relevant for future work.
+
+1.6 Ethics and sustainability
+
+The project has a sustainability motivation because better district-heating monitoring can support more efficient heat delivery, lower return temperatures, and earlier detection of inefficient operation. District heating is also important in future energy systems because it can integrate renewable heat, recovered heat, and low-temperature heat sources.
+
+The ethical risks are limited because the data represents technical building operation rather than personal behavior. However, building-level operational data can still be sensitive. The thesis should therefore avoid publishing unnecessary raw data, private operational details, or information that could identify sensitive infrastructure. The method should also be presented as decision support. Without complete labels, it would be inappropriate to claim that every detected anomaly is a confirmed fault.
+
+
+2. Theoretical background and literature study
+
+2.1 District heating and substation monitoring
+
+District heating transfers heat from producers to consumers through a network of pipes. At a consumer substation, heat is exchanged between the district-heating network and the building heating or domestic hot-water system. The important operational signals commonly include supply temperature, return temperature, flow, and power. Supply temperature describes the temperature of water delivered to the substation, while return temperature describes the temperature after heat has been extracted. Flow describes how much water passes through the system.
+
+The difference between supply and return temperature is often called delta-T. Low delta-T can indicate poor heat extraction or inefficient operation. From an engineering perspective, this is important because high return temperatures can reduce efficiency and make it harder to integrate low-temperature heat sources. However, low delta-T is only one type of operational warning. A substation can behave unusually because of changes in temperature patterns, flow behavior, sensor readings, control settings, or demand regimes. This is why a data-driven anomaly detector may be useful as a complement to simple rule-based checks.
+
+2.2 Anomaly detection
+
+Anomaly detection is the task of identifying observations that deviate from expected behavior. In time-series systems, anomalies may be point anomalies, contextual anomalies, or collective anomalies. A single measurement may be unusual, but in many operational systems the more important unit is a time window. A 24-hour sequence can be anomalous even if individual points are not extreme, because the overall daily pattern differs from normal behavior.
+
+Anomaly detection can be supervised, semi-supervised, or unsupervised. Supervised anomaly detection requires labelled examples of normal and abnormal cases. Semi-supervised approaches often learn normal behavior from mostly normal data and then identify deviations. Unsupervised approaches use the structure of the available data without complete labels. This project is closest to the unsupervised or semi-supervised setting because confirmed fault labels are not available.
+
+The lack of labels affects evaluation. Standard metrics such as accuracy, precision, recall, and F1-score require a trusted ground truth. In this thesis, evaluation instead combines quantitative summaries and qualitative interpretation. Quantitative summaries include anomaly counts, reconstruction-error distributions, threshold comparisons, feature attribution counts, and overlap with low delta-T events. Qualitative evaluation includes visual inspection of anomaly windows and supervisor/domain interpretation.
+
+2.3 Autoencoders and reconstruction error
+
+An autoencoder is a neural network trained to reconstruct its own input. It consists of an encoder and a decoder. The encoder compresses the input into a smaller representation, often called a latent representation. The decoder reconstructs the original input from that representation. During training, the network minimizes the difference between the original input and the reconstruction.
+
+For anomaly detection, the assumption is that the autoencoder learns to reconstruct common patterns better than unusual patterns. If a window resembles the historical training patterns, the reconstruction error should be relatively low. If a window contains unusual behavior, the reconstruction error may increase. This reconstruction error can then be used as an anomaly score.
+
+In this project, the autoencoder is a small one-dimensional convolutional autoencoder. This is appropriate because the input is a multivariate time series with a temporal structure. Convolutional layers can learn local temporal patterns, while pooling compresses the time dimension. Transposed convolutions in the decoder reconstruct the sequence. The architecture is intentionally compact so that it can act as a reliable baseline and remain explainable in the thesis.
+
+2.4 Thresholding reconstruction error
+
+After computing reconstruction error, a threshold is required to decide which windows are anomalous. Two thresholding approaches have been considered in the project. The first is the 99th percentile threshold, where the threshold is set at the 99th percentile of the training reconstruction-error distribution. The second is the 3-sigma rule, where the threshold is set to the training mean plus three standard deviations.
+
+The 99th percentile rule is easy to apply and directly controls the upper tail of the training distribution. However, it can seem arbitrary because the percentile must be chosen manually. The 3-sigma rule is more familiar statistically and was preferred in supervisor feedback. However, it assumes that the mean and standard deviation meaningfully summarize the training-error distribution. If the distribution is skewed or has heavy tails, the 3-sigma threshold can behave differently from the 99th percentile threshold. For that reason, the thesis compares both rules instead of assuming that one is always stricter.
+
+2.5 Feature-level interpretation
+
+A single reconstruction-error value gives an anomaly score but does not explain the anomaly. For operational interpretation, the feature responsible for the anomaly is important. The supervisor specifically emphasized that each detected anomaly should be linked to a feature, such as high supply temperature, unusual return temperature, or unusual flow behavior.
+
+The project addresses this by computing reconstruction error per feature. For each flagged window, the feature with the largest reconstruction-error contribution is treated as the dominant feature. This does not prove the physical fault cause, but it gives a clear starting point for interpretation. It also allows anomaly summaries to be grouped into supply-dominant, return-dominant, and flow-dominant cases.
+
+2.6 Clustering and the HEAT paper
+
+Clustering is an unsupervised method that groups observations by similarity. In the HEAT paper, clustering is used together with encoder-based representations to support fault detection in district-heating substations. The idea is that substations or time-series patterns can be compared within learned groups, making abnormal behavior easier to identify.
+
+In this thesis, clustering is used differently because the dataset is smaller. With fewer buildings, clustering entire substations into large peer groups is less statistically meaningful. Instead, clustering is treated as a supporting interpretation layer. Two uses are considered:
+
+1. Operating-regime clustering, where all retained 24-hour windows are grouped into regimes with similar daily behavior.
+2. Anomaly-only clustering, where only flagged anomaly windows are grouped to identify possible anomaly families.
+
+This means that clustering is not the main detector in the final workflow. The autoencoder reconstruction error is the primary anomaly detector, while clustering helps organize and interpret the detected patterns.
+
+2.7 Method choice
+
+The selected method is appropriate because it matches the data conditions. The dataset has historical time-series measurements but incomplete fault labels. Reconstruction-based anomaly detection can be trained without explicit fault labels. The 24-hour window representation preserves daily operational patterns. The three chosen channels have physical meaning in district-heating operation. Feature-level reconstruction error supports interpretation. The low delta-T baseline gives a simple engineering reference, while clustering provides a secondary way to summarize regimes and anomaly groups.
+
+Alternative methods could include fully rule-based detection, supervised classifiers, statistical forecasting, isolation forests, or recurrent neural networks. A fully rule-based method would be easier to explain but would only detect predefined anomaly types. A supervised classifier would be inappropriate without labelled faults. More complex sequence models could be explored later, but they would be harder to justify as a first thesis method and may require more data or validation. The autoencoder therefore provides a pragmatic balance between flexibility, interpretability, and feasibility.
+
+
+3. Planned methodology
+
+3.1 Data preparation
+
+The first methodological step is to inspect the available district-heating workbook and identify usable heating-consumer sheets. The current thesis work focuses on seven consumer sheets:
+
+1. cons_abat_cisneros
+2. cons_abat_garriga
+3. cons_abat_marcet
+4. cons_abat_oliba
+5. cons_hostatgeria_DHW_radiators
+6. cons_hostatgeria_underfloor_hea
+7. cons_nostra_senyora
+
+The data preparation includes timestamp handling, missing-value checks, removal of windows with insufficient data, and construction of consistent 24-hour windows. The intended model resolution is 15 minutes, so a complete daily window contains 96 samples. Each window contains three channels: supply temperature, return temperature, and flow.
+
+3.2 Model training
+
+A separate reconstruction-based model is trained per building or consumer sheet. This is preferred because each substation can have different operating behavior, demand pattern, and scale. A shared model across all buildings could be considered in future work, but it may mix different normal regimes and reduce interpretability.
+
+The model is a one-dimensional convolutional autoencoder. The encoder contains convolutional layers, ReLU activations, and max-pooling operations. The decoder uses transposed convolutional layers to reconstruct the original sequence. The model is trained by minimizing mean squared reconstruction error between the input and output windows.
+
+3.3 Anomaly scoring and thresholding
+
+After training, each retained window is reconstructed. The reconstruction error is computed as mean squared error across normalized channels and time samples. This produces one anomaly score per window. A window is flagged if its score exceeds the selected threshold.
+
+The main thresholding method is the 3-sigma rule, following supervisor feedback. The earlier 99th percentile threshold is retained as a comparison because it helps show how threshold choice changes the results. The thesis will report both rules in comparison tables, while using 3-sigma as the main result lens.
+
+3.4 Dominant-feature attribution
+
+For every flagged anomaly, reconstruction error is also computed separately for supply temperature, return temperature, and flow. The dominant feature is the feature with the largest reconstruction-error contribution. This creates interpretable categories such as supply-dominant anomaly, return-dominant anomaly, and flow-dominant anomaly.
+
+This attribution is important because the project should not only state that an anomaly was found. It should also show where the anomaly appears in the measured variables. The dominant-feature summaries will be shown in tables and figures for supervisor review.
+
+3.5 Engineering baseline
+
+The low delta-T baseline is calculated independently from the autoencoder. Delta-T is defined as supply temperature minus return temperature. Low delta-T periods are marked as an engineering warning because they may indicate inefficient heat extraction or high return-temperature behavior.
+
+This baseline is not used to train the autoencoder. Instead, it is used afterward as a reference. If an autoencoder anomaly overlaps a low delta-T event, that strengthens confidence that the anomaly has a physically meaningful interpretation. If it does not overlap, the autoencoder may be detecting a different type of abnormal behavior.
+
+3.6 Clustering
+
+Clustering is included as a supporting interpretation method. Operating-regime clustering groups all retained windows according to summary behavior. This can show whether some buildings operate in several distinct regimes and whether anomalies concentrate in specific regimes.
+
+Anomaly-only clustering is applied after the autoencoder has already detected anomaly windows. This groups flagged windows into possible anomaly families. Instead of relying on PCA plots, the interpretation should emphasize feature-based summaries such as supply, return, and flow contributions.
+
+3.7 Evaluation plan
+
+Because complete labels are not available, evaluation must combine quantitative and qualitative evidence.
+
+Quantitative evaluation will include:
+
+1. number of retained windows per sheet,
+2. reconstruction-error distributions,
+3. anomaly counts and anomaly rates,
+4. comparison between 3-sigma and 99th percentile thresholds,
+5. dominant-feature counts,
+6. overlap between autoencoder anomalies and low delta-T baseline,
+7. cluster summaries,
+8. cross-building comparisons.
+
+Qualitative evaluation will include:
+
+1. visual inspection of top anomaly windows,
+2. interpretation of whether supply, return, or flow behavior is abnormal,
+3. review with the supervisor/domain expert,
+4. discussion of whether the method is useful for the later live-data period.
+
+3.8 Expected outcome
+
+The expected outcome of the pre-study is a justified method direction for the degree project. The expected outcome of the full thesis is a working anomaly-detection pipeline, result tables and figures for all usable buildings, and a discussion of how the method can be applied to live data. The thesis should also clearly state the limitations caused by incomplete labels and should avoid claiming confirmed fault diagnosis without domain validation.
+
+
+References
+
+Campos, G. O., Zimek, A., Sander, J., Campello, R. J. G. B., Micenkova, B., Schubert, E., Assent, I., and Houle, M. E. On the Evaluation of Unsupervised Outlier Detection: Measures, Datasets, and an Empirical Study. Data Mining and Knowledge Discovery, 30, 891-927, 2016.
+
+Chandola, V., Banerjee, A., and Kumar, V. Anomaly Detection: A Survey. ACM Computing Surveys, 41(3), Article 15, 2009.
+
+Lund, H., Werner, S., Wiltshire, R., Svendsen, S., Thorsen, J. E., Hvelplund, F., and Mathiesen, B. V. 4th Generation District Heating (4GDH): Integrating smart thermal grids into future sustainable energy systems. Energy, 68, 1-11, 2014.
+
+Pang, G., Shen, C., Cao, L., and van den Hengel, A. Deep Learning for Anomaly Detection: A Review. ACM Computing Surveys, 54(2), Article 38, 2021.
+
+HEAT: Hierarchical-constrained Encoder-Assisted Time series clustering for fault detection in district heating substations. Full bibliographic details to be completed from the final paper record before submission.
