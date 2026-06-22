@@ -1,0 +1,7 @@
+\section{Conclusion}
+
+This thesis develops a reconstruction-based anomaly-detection pipeline for a small district-heating network with limited fault labels. The work adapts ideas from the HEAT paper to a setting where long historical coverage is more useful than large-scale peer-group clustering. The current results show that the method can identify interpretable anomalous operating windows and that the strongest case is underfloor heating, where the detected anomalies also align with a simple engineering low delta-T rule.
+
+The broader seven-sheet analysis shows that anomaly behavior is heterogeneous across the network. Flow-dominant anomalies are the most common, return-dominant anomalies are the second main group, and supply-dominant anomalies are less frequent. Stabilized flow improves interpretability relative to raw flow and is therefore the main reporting lens. Operating-regime clustering remains useful for context, but dominant-feature attribution is the more effective explanation layer.
+
+The next stage of the work is to apply the current detector to live data and use that prospective period as an operational evaluation step. This will help determine whether the anomaly candidates identified in historical data correspond to meaningful ongoing system behavior.

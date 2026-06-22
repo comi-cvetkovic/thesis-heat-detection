@@ -1,0 +1,27 @@
+\section{Discussion}
+
+\subsection{What is currently convincing}
+
+The most convincing current conclusion is that reconstruction-based anomaly detection is viable for this dataset and that \texttt{cons\_hostatgeria\_underfloor\_hea} provides a strong thesis case. It is physically distinctive, it overlaps the engineering baseline, and its anomaly patterns remain interpretable under both raw and stabilized flow views.
+
+\subsection{What remains uncertain}
+
+The biggest remaining limitation is still validation. Most sheets do not have labeled faults, so anomaly interpretation depends on triangulation:
+
+\begin{itemize}
+\item reconstruction error
+\item dominant feature
+\item signal plots
+\item low delta-T overlap
+\item supervisor and domain review
+\end{itemize}
+
+This means the thesis should frame most anomalies as credible candidates rather than confirmed faults.
+
+\subsection{Implications for live deployment}
+
+The historical result pack is already useful for deployment preparation. Once one to two months of live data become available, the intended strategy is to apply the historical-trained detector prospectively and evaluate the flagged windows through operational review rather than standard classification metrics.
+
+\subsection{Writing priorities}
+
+When drafting the final thesis, the narrative should remain focused. The autoencoder is the main method. The low delta-T baseline is the main engineering comparison. Dominant-feature attribution is the main anomaly interpretation layer. Clustering should be presented as a supporting analysis rather than the core detection method.

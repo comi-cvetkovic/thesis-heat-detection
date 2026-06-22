@@ -1,0 +1,25 @@
+\section{Background}
+
+\subsection{District-heating anomaly detection}
+
+District-heating systems are monitored through temperature, flow, and power-related signals that reflect both thermal performance and hydraulic behavior. In practice, low supply-return temperature difference is often used as a first engineering warning sign because it may indicate poor heat extraction, inefficient operation, or high return-temperature behavior. However, low delta-T only captures one narrow anomaly type and cannot describe all abnormal operating patterns.
+
+\subsection{HEAT paper as reference}
+
+The HEAT paper proposes a hierarchical-constrained, encoder-assisted clustering approach for fault detection in district-heating substations. Its main idea is to learn compact representations of time-series behavior and then use clustering to approximate peer groups for local comparison. This is well suited to a large network with many substations, where peer comparison can be statistically meaningful.
+
+In this thesis, HEAT remains the main methodological reference. The adaptation is necessary because the available dataset has far fewer consumer sheets than the HEAT case study. The practical consequence is that clustering is still valuable, but its role shifts from being the primary fault-detection structure to being a secondary interpretation layer.
+
+\subsection{Reconstruction-based anomaly detection}
+
+An autoencoder is a neural network trained to reconstruct its own input. In the thesis pipeline, each input is a 24-hour window containing three channels: supply temperature, return temperature, and derived flow. The encoder compresses the window into a latent representation, and the decoder reconstructs the original signal. If a window is typical of historical operating behavior, the reconstruction error is low. If a window is unusual, the reconstruction error tends to increase. This provides a natural anomaly score without requiring explicit labels.
+
+\subsection{Physics-informed feature construction}
+
+The third input channel is derived from the thermal balance equation:
+
+\[
+\dot{m} = \frac{P}{c_p (T_s - T_r)}
+\]
+
+where \(P\) is thermal power, \(c_p\) is the specific heat capacity of water, \(T_s\) is supply temperature, and \(T_r\) is return temperature. In this thesis, the power measurement is treated as kilowatts for all sheets based on supervisor guidance. A practical difficulty is that very small \(T_s - T_r\) can cause the derived flow to become numerically unstable. For that reason, both a raw-flow and a stabilized-flow formulation are retained in the analysis, with stabilized flow used as the main reporting lens.

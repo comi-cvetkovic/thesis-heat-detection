@@ -1,0 +1,71 @@
+\section{Method}
+
+\subsection{Overview}
+
+The final workflow used in the thesis is:
+
+\begin{enumerate}
+\item preprocess each heating-consumer sheet into retained 24-hour windows
+\item construct three model channels: supply temperature, return temperature, and a processed flow channel
+\item train a 1D convolutional autoencoder on the historical windows
+\item compute reconstruction error for each window
+\item flag anomalous windows using a training-distribution threshold
+\item attribute each anomaly to its dominant feature using per-feature reconstruction error
+\item compare the detected anomalies with engineering baselines and clustering-based interpretation views
+\end{enumerate}
+
+\subsection{Autoencoder architecture}
+
+The current architecture is a compact 1D convolutional autoencoder. The encoder contains two convolutional blocks with ReLU activations and max pooling, while the decoder reconstructs the signal using transposed convolutions. The model is intentionally conservative and was used as a first reliable baseline for reconstruction-based anomaly detection.
+
+\subsection{Feature construction}
+
+The model uses three synchronized channels per 24-hour window:
+
+\begin{itemize}
+\item supply temperature
+\item return temperature
+\item flow channel
+\end{itemize}
+
+The flow channel is included because thermal anomalies are often easier to interpret when temperature behavior is viewed together with flow-related behavior. During method development, several formulations of the flow signal were explored in order to improve numerical robustness. In the final draft, the emphasis is therefore on the behavior of the input flow channel rather than on the intermediate engineering details of every tested formulation.
+
+\subsection{Thresholding}
+
+Two threshold rules were evaluated:
+
+\begin{itemize}
+\item training 99th percentile (\texttt{p99})
+\item training mean plus three standard deviations (\texttt{3-sigma})
+\end{itemize}
+
+The latest main result pack uses the 3-sigma rule, following supervisor guidance. The thesis should discuss that neither threshold is uniformly stricter across all sheets; the difference depends on the shape of the training reconstruction-error distribution.
+
+\subsection{Engineering baseline}
+
+The engineering baseline is a low delta-T anomaly rule computed only on active-heating rows. It is not used by the autoencoder. Instead, it is used afterward to check whether detected anomaly windows overlap a simple, physically interpretable warning signal.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{autoencoder_concept_diagram.png}
+    \caption{Conceptual view of the reconstruction-based anomaly detector. A 24-hour window containing supply temperature, return temperature, and the flow channel is encoded, reconstructed, and scored by reconstruction error.}
+    \label{fig:autoencoder_concept}
+\end{figure}
+
+\subsection{Clustering roles}
+
+Two clustering roles were explored:
+
+\begin{itemize}
+\item operating-regime clustering on all windows, using summary statistics of each day
+\item anomaly-only clustering on flagged windows, used as a secondary anomaly-family interpretation layer
+\end{itemize}
+
+The thesis should make clear that clustering is supportive rather than central in the final pipeline.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{threshold_distribution_by_sheet_2026-06-07.png}
+    \caption{Training reconstruction-error distributions for the modeled sheets, shown with both the training 99th percentile threshold and the 3-sigma threshold. The difference between the two thresholds depends on the shape and spread of the training reconstruction-error distribution.}
+    \label{fig:threshold_distributions}
+\end{figure}

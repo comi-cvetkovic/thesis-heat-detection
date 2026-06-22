@@ -1,0 +1,22 @@
+%% Changed to use expl3 strcompare rather than xstring's IfEqCase, since the later is not expandable
+%% The insight for this is from Enrico Gregorio - egreg's posing of 26 April 2016 at 
+%% https://tex.stackexchange.com/questions/306484/how-do-i-perform-an-expandable-string-comparison
+% The strcompare is added to kththesis.cls
+% Note that this is a reduced version of the usual schools_and_programs.ins file
+% as it is only to support the TIMTM and TMMTM programs
+
+\newcommand{\schoolAcronym}[1]{%
+    \strcompare{#1}{ABE}{School of Architecture and the Built Environment}{}%
+    \strcompare{#1}{ITM}{School of Industrial Engineering and Management}{}%
+    \strcompare{#1}{SCI}{School of Engineering Sciences}{}%
+    \strcompare{#1}{CBH}{School of Engineering Sciences in Chemistry, Biotechnology and Health}{}%
+    \strcompare{#1}{EECS}{School of Electrical Engineering and Computer Science}{}%
+}
+
+\newcommand{\programmecode}[1]{%
+    \strcompare{#1}{TIMTM}{Master's Programme, Interactive Media Technology, 120 credits}{}%
+
+    \strcompare{#1}{TMMTM}{Master's Programme, Media Management, 120 credits}{}%
+}
+
+

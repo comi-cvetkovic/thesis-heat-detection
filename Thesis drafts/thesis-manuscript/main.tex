@@ -1,0 +1,118 @@
+\documentclass[manuscript, screen]{timtm}
+
+\makeatletter%
+\@ifclassloaded{acmart}%
+  {\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+   \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}}%
+  {\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+   \rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em\TeX}}}}%
+\makeatother%
+
+\setcopyright{rightsretained}
+\copyrightyear{2026}
+
+\input{lib/includes}
+\input{lib/kthcolors}
+
+% Draft toggle for Overleaf.
+% Set \fullfiguresfalse for a lighter compile with only the core figures.
+% Set \fullfigurestrue to include the full figure set.
+\newif\iffullfigures
+\fullfiguresfalse
+
+\makeatletter%
+\@ifclassloaded{acmart}%
+{%
+\newcommand{\alttitle}[1]{}
+\newcommand{\altsubtitle}[1]{}
+\newenvironment{swedishabstract}{}{}
+\newcommand{\SwedishKeywords}[1]{}
+}{%
+\newcommand{\showISBNx}{}
+\newcommand{\showISBNxiii}{}
+}%
+\makeatother%
+
+\begin{document}
+\input{custom_configuration}
+
+\title[Anomaly Detection in District Heating Substations]{Anomaly Detection in District Heating Substations Using Reconstruction-Based Models}
+\alttitle{Anomalidetektion i fj\"arrv\"armecentraler med rekonstruktionsbaserade modeller}
+
+\makeatletter
+\author{\@authorsFirstname\space\@authorsLastname}
+\email{\@email}
+\if\relax\detokenize\expandafter{\@secondAuthorsFirstname}\relax\else
+\author{\@secondAuthorsFirstname\space\@secondAuthorsLastname}
+\email{\@secondemail}
+\fi
+\affiliation{%
+  \institution{KTH Royal Institute of Technology, School of Electrical Engineering and Computer Science}
+  \city{Stockholm}
+  \country{Sweden}
+  \postcode{SE 100 44}
+}
+\makeatother
+
+\begin{abstract}
+\begin{scontents}[store-env=abstracts,print-env=false]
+This thesis investigates anomaly detection in a small district-heating network using historical operational data from multiple consumer substations. The work starts from the HEAT paper as a methodological reference, but adapts the approach to a setting with fewer substations, longer historical coverage, and limited fault labels. The main method is a reconstruction-based anomaly detector that models 24-hour windows of supply temperature, return temperature, and derived flow. The study compares engineering baselines, thresholding rules, dominant-feature attribution, and clustering-based interpretation in order to identify anomaly candidates that can be reviewed with domain experts and later applied to live operational data.
+\end{scontents}
+\end{abstract}
+
+\begin{swedishabstract}
+\begin{scontents}[store-env=abstracts,print-env=false]
+Detta examensarbete unders\"oker anomalidetektion i ett litet fj\"arrv\"armen\"at med hj\"alp av historiska driftsdata fr\aa n flera kundcentraler. Arbetet utg\aa r fr\aa n HEAT-artikeln som metodologisk referens, men anpassar angreppss\"attet till en situation med f\"arre undercentraler, l\"angre historisk t\"ackning och begr\"ansad tillg\aa ng till felm\"arkta data. Huvudmetoden \"ar en rekonstruktionsbaserad anomalidetektor som modellerar 24-timmarsf\"onster av framledningstemperatur, returtemperatur och h\"arlett fl\"ode. Studien j\"amf\"or ingenj\"orsm\"assiga baslinjer, tr\"oskelv\"ardesmetoder, dominant-funktionsattribuering och klusterbaserad tolkning f\"or att identifiera anomalikandidater som kan granskas tillsammans med dom\"anexperter och senare anv\"andas p\aa\ live-data.
+\end{scontents}
+\end{swedishabstract}
+
+\keywords{district heating, anomaly detection, autoencoder, reconstruction error, time-series analysis}
+\SwedishKeywords{fj\"arrv\"arme, anomalidetektion, autoencoder, rekonstruktionsfel, tidsserieanalys}
+
+\pagenumbering{alph}
+% Disable the template cover in the working draft: it is the main source of
+% Overleaf compatibility issues and adds compile overhead without affecting
+% the thesis content under review.
+% \kthcover
+\titlepage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\maketitle
+
+\tableofcontents
+\clearpage
+
+\input{sections/01_introduction}
+\input{sections/02_background}
+\input{sections/03_data}
+\input{sections/04_method}
+\input{sections/05_results}
+\input{sections/06_discussion}
+\input{sections/07_conclusion}
+
+\begin{acks}
+The acknowledgments section should be finalized once the supervisor, collaborators, and external contributors to the project are confirmed.
+\end{acks}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\appendix
+\input{sections/appendix_a_notes}
+
+\label{pg:lastPageofMainmatter}
+
+% Disable the template back-cover and DiVA export pages in the working draft
+% to keep Overleaf compilation reliable on the free plan.
+% \cleardoublepage
+% \clearpage\thispagestyle{empty}\mbox{}
+% \kthbackcover
+% \fancyhead{}
+% \section*{\texteuro\texteuro\texteuro\texteuro\@ For DIVA \texteuro\texteuro\texteuro\texteuro}
+% \lstset{numbers=none}
+% \divainfo{pg:lastPageofMainmatter}
+
+\end{document}

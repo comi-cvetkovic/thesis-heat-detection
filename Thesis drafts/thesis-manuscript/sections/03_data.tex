@@ -1,0 +1,71 @@
+\section{Data}
+
+\subsection{Available sources}
+
+The thesis uses historical data from a district-heating network associated with Montserrat / Abat Oliba. The broader exploratory phase reviewed seven heating-consumer sheets. For the current draft and the main thesis narrative, the analysis is narrowed to the five sheets with the most usable data and without long faulty constant-value periods:
+
+\begin{itemize}
+\item \texttt{cons\_abat\_cisneros}
+\item \texttt{cons\_abat\_garriga}
+\item \texttt{cons\_abat\_marcet}
+\item \texttt{cons\_abat\_oliba}
+\item \texttt{cons\_hostatgeria\_underfloor\_hea}
+\end{itemize}
+
+Two additional sheets, \texttt{cons\_hostatgeria\_DHW\_radiators} and \texttt{cons\_nostra\_senyora}, were retained during the exploratory phase but are not used in the main thesis draft because they contain long periods of faulty constant-value behavior that make interpretation less reliable.
+
+These sheets are complemented by reports, drawings, and contextual material about the network. This contextual material is valuable because it helps interpret anomaly candidates even when explicit fault labels are not available.
+
+\subsection{Main measured variables}
+
+The most consistently available variables across the modeled heating-consumer sheets are:
+
+\begin{itemize}
+\item timestamp
+\item supply temperature
+\item return temperature
+\item power
+\end{itemize}
+
+Derived features are then computed from these measured variables, most notably delta-T and derived flow.
+
+\subsection{Preprocessing decisions}
+
+The current preprocessing pipeline uses the following decisions:
+
+\begin{itemize}
+\item active-heating rows are selected using positive power and positive delta-T
+\item data is resampled to 15-minute intervals
+\item windows are formed as 24-hour segments with 12-hour stride
+\item windows with low data completeness or insufficient active-heating share are discarded
+\item channels are normalized before being passed to the autoencoder
+\end{itemize}
+
+These decisions are intended to focus the model on meaningful heating behavior rather than long inactive periods.
+
+\subsection{Known limitations}
+
+The most important limitations of the dataset are:
+
+\begin{itemize}
+\item lack of reliable fault labels
+\item heterogeneity across substations
+\item possible instability in derived flow when delta-T is small
+\item variation in data quality, including zeros and missing periods
+\end{itemize}
+
+Because of these limitations, evaluation in this thesis is based on anomaly review, cross-method comparison, and supervisor/domain interpretation rather than standard supervised metrics.
+
+\subsection{Five-building thesis scope}
+
+The results chapter therefore focuses on the following five-building subset:
+
+\begin{itemize}
+\item Abat Cisneros
+\item Abat Garriga
+\item Abat Marcet
+\item Abat Oliba
+\item Hostatgeria Underfloor
+\end{itemize}
+
+This choice is practical rather than theoretical. The discarded sheets are not treated as evidence against the method; they are simply weaker as thesis cases because faulty constant-value periods introduce ambiguity that is difficult to resolve without stronger data validation.

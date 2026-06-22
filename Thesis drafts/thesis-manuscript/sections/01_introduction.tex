@@ -1,0 +1,22 @@
+\section{Introduction}
+
+District-heating substations operate continuously and generate large volumes of time-series data, but real fault labels are often sparse or unavailable. This creates a practical detection problem: operators still need a way to identify unusual operating periods, even when a supervised classification setup is not possible. The aim of this thesis is therefore to build and evaluate an anomaly-detection pipeline that can identify physically interpretable abnormal behavior in district-heating substations using historical data and later be applied to live data.
+
+The work is motivated by the HEAT paper, which combines encoder-based representation learning and clustering for fault detection in district-heating substations. However, the available KTH thesis dataset differs in two important ways. First, the network is much smaller, which weakens the statistical value of peer-group clustering. Second, the historical coverage is much longer, which makes per-substation temporal modeling more promising than network-wide peer comparison alone. Because of this, the thesis focuses primarily on reconstruction-based anomaly detection and treats clustering as a supporting interpretation tool rather than the central detection mechanism.
+
+The main research question is:
+
+\begin{quote}
+Can reconstruction-based anomaly detection on supply temperature, return temperature, and derived flow identify interpretable abnormal operating periods in a small district-heating network?
+\end{quote}
+
+The thesis also addresses the following supporting questions:
+
+\begin{itemize}
+\item How should the derived flow feature be handled when small temperature differences cause numerical instability?
+\item How does a reconstruction-based detector compare with a simple engineering low delta-T baseline?
+\item What is the effect of threshold choice on the number and type of detected anomalies?
+\item Can clustering still help as an interpretation layer when the number of substations is small?
+\end{itemize}
+
+The rest of the thesis is organized as follows. Chapter~2 reviews the relevant background and the HEAT paper. Chapter~3 describes the available datasets and preprocessing assumptions. Chapter~4 presents the anomaly-detection methodology. Chapter~5 summarizes the experimental results. Chapter~6 discusses interpretation, limitations, and implications for live deployment. Chapter~7 concludes the thesis and outlines future work.

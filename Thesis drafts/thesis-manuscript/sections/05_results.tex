@@ -1,0 +1,146 @@
+\section{Results}
+
+\subsection{Current main result set}
+
+The current end-to-end result set used for the draft focuses on five heating-consumer sheets: Abat Cisneros, Abat Garriga, Abat Marcet, Abat Oliba, and Hostatgeria Underfloor. These five buildings were kept because they provided the most usable retained windows without the long faulty constant-value periods observed in two of the exploratory cases. The strongest anomaly case remains \texttt{cons\_hostatgeria\_underfloor\_hea}, while the five-building set as a whole still shows substantial variation in anomaly count, dominant feature, and engineering-baseline overlap.
+
+\begin{table}[t]
+\centering
+\caption{Five-building result summary under the 3-sigma threshold.}
+\label{tab:five_building_summary}
+\begin{tabular}{lrrrr}
+\toprule
+Building & Windows & Flagged & Rate [\%] & Top feature \\
+\midrule
+Abat Cisneros & 1113 & 4 & 0.36 & Flow \\
+Abat Garriga & 1107 & 17 & 1.54 & Return \\
+Abat Marcet & 951 & 10 & 1.05 & Flow \\
+Abat Oliba & 955 & 2 & 0.21 & Return \\
+Hostatgeria Underfloor & 323 & 5 & 1.55 & Supply \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{thesis_selected5_anomaly_summary.png}
+    \caption{Retained-window count, flagged-window count, and flagged-window rate for the five selected buildings.}
+    \label{fig:selected5_anomaly_summary}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{thesis_selected5_reconstruction_error_grid.png}
+    \caption{Reconstruction-error timelines for the five selected buildings. The horizontal dashed line is the anomaly threshold and red points are flagged windows.}
+    \label{fig:selected5_reconstruction_grid}
+\end{figure}
+
+\iffullfigures
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{thesis_selected5_top_anomaly_grid.png}
+    \caption{Top reviewed anomaly window for each of the five selected buildings. Each panel shows supply temperature, return temperature, the flow channel, and delta-T over the 24-hour anomaly window.}
+    \label{fig:selected5_top_anomalies}
+\end{figure}
+\fi
+
+\subsection{Dominant-feature interpretation}
+
+The clearest current anomaly-typing view is the dominant-feature analysis. Across the five-building set, the anomalies are mainly flow-dominant and return-dominant, with Hostatgeria Underfloor providing the clearest supply-dominant case. This indicates that the autoencoder is detecting multiple anomaly families rather than only one repeated signature.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{thesis_selected5_feature_type_by_sheet.png}
+    \caption{Dominant anomaly feature by sheet for the five selected buildings.}
+    \label{fig:selected5_feature_type}
+\end{figure}
+
+\iffullfigures
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{anomaly_feature_space_stabilized_log.png}
+    \caption{Anomaly feature space using actual per-feature reconstruction errors. The axes are real feature-error quantities rather than PCA projections, and the point color indicates the dominant anomaly feature.}
+    \label{fig:anomaly_feature_space}
+\end{figure}
+\fi
+
+\subsection{Low delta-T overlap}
+
+Only one sheet, \texttt{cons\_hostatgeria\_underfloor\_hea}, shows strong overlap between top reviewed autoencoder anomalies and the low delta-T baseline. This should be interpreted carefully. It makes underfloor heating the strongest validated case, but the absence of overlap in the other four buildings does not invalidate the autoencoder. It instead suggests that many detected anomalies are not low delta-T events and therefore require interpretation through dominant feature, flow-channel behavior, and domain review.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{thesis_selected5_baseline_vs_autoencoder.png}
+    \caption{Autoencoder anomaly counts compared with the engineering low delta-T baseline for the five selected buildings.}
+    \label{fig:selected5_baseline_compare}
+\end{figure}
+
+\iffullfigures
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{thesis_selected5_low_delta_overlap.png}
+    \caption{Reviewed anomaly windows with low delta-T overlap and the corresponding overlap rate. Hostatgeria Underfloor is the only building with substantial overlap.}
+    \label{fig:selected5_low_delta_overlap}
+\end{figure}
+\fi
+
+\subsection{Operating regimes}
+
+Operating-regime clustering indicates that daily windows do not form one undifferentiated population. Some sheets occupy very distinctive regimes, and regime occupancy is uneven. Underfloor heating stands out as the most distinctive operating-regime case. This supports the conclusion that its anomalies are associated with a coherent subsystem behavior rather than random variation.
+
+\iffullfigures
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{thesis_selected5_window_cluster_distribution.png}
+    \caption{Operating-regime cluster distribution for the five selected buildings. The interpretation should focus on the fact that occupancy is uneven and that underfloor heating occupies a distinctive regime, rather than on the cluster labels themselves.}
+    \label{fig:operating_regimes}
+\end{figure}
+\fi
+
+\subsection{Threshold comparison}
+
+The comparison between p99 and 3-sigma shows that threshold choice materially affects anomaly counts. The effect is sheet-dependent rather than global: some sheets become more selective under 3-sigma, while others become less selective. This is a useful result in itself because it shows that the training-error distribution shape must be considered when choosing an anomaly threshold.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{threshold_distribution_by_sheet_2026-06-07.png}
+    \caption{Training reconstruction-error distributions with the p99 and 3-sigma thresholds overlaid.}
+    \label{fig:threshold_result_view}
+\end{figure}
+
+\subsection{Flow-channel sensitivity comparison}
+
+During model development, the anomaly counts were found to be sensitive to how the flow channel was represented. The clearest example is \texttt{cons\_abat\_oliba}, where the direct raw-flow version produced windows dominated by very small delta-T and inflated flow values, while the final flow-channel representation yielded anomalies that were more interpretable in terms of supply or return behavior.
+
+\iffullfigures
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{thesis_selected5_raw_vs_processed_counts.png}
+    \caption{Flagged anomaly counts for raw-flow and final flow-channel representations. The comparison is kept here as a sensitivity analysis for the draft.}
+    \label{fig:flow_channel_sensitivity}
+\end{figure}
+\fi
+
+\iffullfigures
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\linewidth]{inspect_autoencoder_cons_abat_oliba_01.png}
+    \hfill
+    \includegraphics[width=0.48\linewidth]{inspect_autoencoder_cons_abat_oliba_stabilized_log_01.png}
+    \caption{Abat Oliba top anomaly under the raw-flow representation (left) and the final flow-channel representation (right). This pair is retained in the draft because it is the clearest visual justification for the final flow-channel choice, even if only one representation will be emphasized in the final thesis version.}
+    \label{fig:abat_oliba_flow_compare}
+\end{figure}
+\fi
+
+\subsection{Train-test split and anomaly timing}
+
+The anomalies are not confined to the first chronological portion of the data. Some buildings show both training and later test-period anomalies, which is useful when thinking about eventual live deployment.
+
+\iffullfigures
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{thesis_selected5_train_vs_test_split.png}
+    \caption{Train versus test anomaly split for the five selected buildings.}
+    \label{fig:selected5_train_test}
+\end{figure}
+\fi

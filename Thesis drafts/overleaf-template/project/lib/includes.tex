@@ -1,0 +1,62 @@
+%% If you are going to include source code (or code snippets) you can use minted in a listings environment
+% This is also necessary for the For DIVA page
+\usepackage{listings}		    %% For source code listing
+
+%% The following are needed for generating the DiVA page(s)
+\usepackage[force-eol=true]{scontents}              %% Needed to save lang, abstract, and keywords
+\usepackage{pgffor}                 %% includes the foreach loop
+
+% The following is needed in conjunction with generating the DiVA data with abstracts and keywords using the scontents package and a modified listings environment
+\makeatletter
+\let\verbatimsc\@undefined
+\let\endverbatimsc\@undefined
+\lst@AddToHook{Init}{\hyphenpenalty=50\relax}
+\makeatother
+
+
+\lstnewenvironment{verbatimsc}
+    {
+    \lstset{%       \sffamily\tiny
+        basicstyle=\linespread{1}\ttfamily\tiny,
+        backgroundcolor=\color{white},
+        %basicstyle=\tiny,
+        columns=fullflexible,           %% for abstracts, needs to be set for pdfLaTeX
+        %columns=[l]fixed,
+        language=[LaTeX]TeX,
+        %numbers=left,
+        %numberstyle=\tiny\color{gray},
+        keywordstyle=\color{red},
+        breaklines=true,                 % sets automatic line breaking
+        breakatwhitespace=true,          % sets if automatic breaks should only happen at whitespace
+        %keepspaces=false,
+        breakindent=0em,
+        %fancyvrb=true,
+        frame=none,                     % turn off any box
+        postbreak={}                    % turn off any hook arrow for continuation
+    }
+}{}
+
+%% Add some more keyowrds to bring out the structure more
+\lstdefinestyle{[LaTeX]TeX}{
+morekeywords={begin, todo, textbf, textit, texttt}
+}
+
+\lstset{
+  literate={ä}{{\"a}}1
+           {ö}{{\"o}}1
+           {ü}{{\"u}}1
+           {å}{{\aa}}1
+           {Ä}{{\"A}}1
+           {Ö}{{\"O}}1
+           {Ü}{{\"U}}1
+           {Å}{{\AA}}1
+}
+
+% for experiments with new cover
+\usepackage{eso-pic}
+\usepackage[absolute,overlay]{textpos}
+
+\usepackage{tikz}
+\usepackage{colortbl}
+\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,fit,positioning, decorations.pathreplacing, calc,shapes}
+

@@ -1,0 +1,732 @@
+%%
+%% This is file 'sample-degree-report.tex' was based on the ACM's`sample-manuscript.tex'.
+%% Note that this was taken from the Overleaf project: https://www.overleaf.com/gallery/tagged/acm-official#.WOuOk2e1taQ
+%% It has been adapted to use the TIMTM template (adapted from CHI Proceedings Template) for
+%% the Interactive Media Technology (TIMTM) and Media Management (TMMTM) programmes at KTH Royal Institute of Technology.
+%% 
+%% 2021-11-09 Gerald Q. Maguire Jr. adapted template to KTH's TIMTM and TMMTM requirements, including:
+%% removing the ACM copyright and other notices in the generate documents - as these are not applicable
+%% and rewriting some of the contents of the sample document.
+%% Note that the teaserfigure environment simply ignores content, s there should
+%% note be teaser figures in a thesis.
+%%§
+%%
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the file: acmart-primary/acmart.dtx - from the github
+%%
+%% The first command in your LaTeX source must be the \documentclass command.
+
+%%%% Generic manuscript mode, required for submission
+%%%% and peer review
+%\documentclass[manuscript,screen,review]{timtm}
+\documentclass[manuscript, screen]{timtm}
+%% If you add the review option, then line numbers are added to the manuscript.
+%% Note that as the thesis is in a single column format,
+%%  the line numbers are only on the left.
+%% The option authordraft adds a draft watermark.
+
+%% Some of the options have been removed, as they did not make sense for a thesis.
+%% Note that there is not an anonymous option, as theses are never anonymous.
+%% There is also no authorversion option.
+%% Note that you do not need the sigcconf for the thesis template
+
+%% Fonts used in the template cannot be substituted; margin 
+%% adjustments are not allowed.
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\makeatletter%
+\@ifclassloaded{acmart}%
+  {\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+   \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}}%
+  {\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+   \rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em\TeX}}}}%
+\makeatother%
+
+
+
+%% Note that it you do happen to repurpose this file for a submission to SIGCHI, you might add the line below - as you need to retain the copyright, since KTH must be able to distribute copies upon request.
+\setcopyright{rightsretained}
+
+\copyrightyear{2022}
+
+%% For an actual ACM submission
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+%\setcopyright{acmcopyright}
+%\copyrightyear{2018}
+%\acmYear{2018}
+%\acmDOI{10.1145/1122445.1122456}
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+%\acmConference[Woodstock '18]{Woodstock '18: ACM Symposium on Neural  Gaze Detection}{June 03--05, 2018}{Woodstock, NY}
+%\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,  June 03--05, 2018, Woodstock, NY}
+%\acmPrice{15.00}
+%\acmISBN{978-1-4503-XXXX-X/18/06}
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% Use numbered citations and references. 
+%%
+% include a variety of packages that are useful
+\input{lib/includes}
+\input{lib/kthcolors}
+
+%\input{lib/defines}  % load some additional definitions to make writing more consistent
+
+
+%% If the acmart document class is being used, define away some commands and environment
+%% If not, then enable ISBNs to be shown in references
+\makeatletter%
+\@ifclassloaded{acmart}%
+{%
+\newcommand{\alttitle}[1]{}
+\newcommand{\altsubtitle}[1]{}
+\newenvironment{swedishabstract}{}{}
+\newcommand{\SwedishKeywords}[1]{}
+}{%
+% Define these so that the bibliography will include ISBNs
+\newcommand{\showISBNx}{}
+\newcommand{\showISBNxiii}{}
+}%
+\makeatother%
+
+
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+% insert the configuration information with author(s), examiner, supervisor(s), ...
+\input{custom_configuration}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{The Report Title}
+%\subtitle{A short subtitle}
+
+% give the alternative title - i.e., if the thesis is in English, then give a Swedish title
+\alttitle{Detta är den svenska översättningen av titeln}
+\altsubtitle{Detta är den svenska översättningen av undertiteln}
+\makeatletter
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+
+%% For the thesis template we will take the authors names and e-mail addresses from the custom_configuration.tex file
+\author{\@authorsFirstname\space\@authorsLastname}
+%\authornote{Both authors contributed equally to this research.}
+\email{\@email}
+%\orcid{1234-5678-9012}
+%% If there is no second author (which should be the case for a second cycle thesis
+%% comment out the following line and the additional \email line
+\author{\@secondAuthorsFirstname\space\@secondAuthorsLastname}
+% Apply the same authornote for the second author
+%\authornotemark[1]
+\email{\@secondemail}
+%\orcid{1234-5678-901X}
+\affiliation{%
+  \institution{KTH Royal Institute of Technology, School of Electrical Engineering and Computer Science}
+  %\streetaddress{Street address}
+  \city{Stockholm}
+  \country{Sweden}
+  \postcode{SE 100 44}
+}
+\makeatother
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+\begin{scontents}[store-env=abstracts,print-env=false]
+  This sample report describes the formatting
+  requirements for a Interactive Media Technology (TIMTM) and Media Management (TMMTM) programmes at KTH Royal Institute of Technology. It is based upon the ACM conference proceedings format, and offers
+  recommendations on writing for the worldwide SIGCHI
+  readership. Please review this document, as some format details have changed
+  relative to previous years. Note that the template now generates the KTH front cover, titlepage, and information for entering the meta data associated with your thesis into DiVA. Abstracts should be about 150 words.
+  
+  All theses at KTH are \textit{required} to have an abstract in \textbf{both} English and Swedish.
+ \end{scontents}
+\end{abstract}
+
+\begin{swedishabstract}
+\begin{scontents}[store-env=abstracts,print-env=false]
+Alla avhandlingar vid KTH \textit{måste ha} ett abstrakt på \textbf{både} engelska och svenska.
+
+Om du skriver din avhandling på svenska ska detta göras först (och placera det som det första abstraktet) - och du bör revidera det vid behov. Om du gör detta måste du ändra dokumentmallen - eftersom den förutsätter att den första sammanfattningen är på engelska och den andra på svenska.
+\end{scontents}
+\end{swedishabstract}
+
+%%
+%% The code below is generated by the tool at http://dl.acm.org/ccs.cfm.
+%% Please copy and paste the code instead of the example below.
+%%
+\begin{CCSXML}
+<ccs2012>
+ <concept>
+  <concept_id>10010520.10010553.10010562</concept_id>
+  <concept_desc>Computer systems organization~Embedded systems</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10010520.10010575.10010755</concept_id>
+  <concept_desc>Computer systems organization~Redundancy</concept_desc>
+  <concept_significance>300</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10010520.10010553.10010554</concept_id>
+  <concept_desc>Computer systems organization~Robotics</concept_desc>
+  <concept_significance>100</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10003033.10003083.10003095</concept_id>
+  <concept_desc>Networks~Network reliability</concept_desc>
+  <concept_significance>100</concept_significance>
+ </concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Computer systems organization~Embedded systems}
+\ccsdesc[300]{Computer systems organization~Redundancy}
+\ccsdesc{Computer systems organization~Robotics}
+\ccsdesc[100]{Networks~Network reliability}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+\keywords{datasets, neural networks, gaze detection, text tagging}
+% The following adds the Swedsih version of your keywords
+\SwedishKeywords{datauppsättningar, neurala nätverk, blickdetektering, texttaggning}
+
+
+%% For KTH theses
+%%% Set the numbering for the title page to a numbering series not in the preface or body
+\pagenumbering{alph}
+\kthcover
+\titlepage
+% document/book information page - if you don't want the copyright to appear comment the next line out - note that this page is unnecessary since the first page of the manuscript has the copyright information - based upon \setcopyright{}.
+%\bookinfopage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Introduction}
+The ``\verb|timtm|'' document class used here is \emph{very} similar to that used for SIGCHI
+conference proceedings. It is based upon the ACM's consolidated article template, i.e. ``\verb|acmart|'' document class.
+The goal is a consistent, high-quality appearance; therefore, we ask that authors follow some
+simple guidelines. You should format your report exactly like this
+document. The easiest way to do this is to replace the content with
+your own material.  This document describes how to prepare your
+submissions using \LaTeX\@.
+
+A good first step when starting with this document in Overleaf is to copy the project and rename the project to include your name in the project's name, thus making it easier for your examiner and supervisor(s) to identify which project is your project.
+
+\section{Template Overview}
+
+This document will \emph{not} explain all the major features of the \verb|acmart| document
+class, but will focus on the features of the \verb|timtm| document
+class. The \verb|timtm| document
+class is purposely similar to the \verb|acmart| document
+class, thus facilitating your submitting your report to an ACM conference\footnote{Simply change the document class from timtm to acmart. This sample document conditionally redefines some commands and an environment - so that the features added for a degree project are not included in the resulting document.}. For further information about the details of the \verb|acmart| document
+class, see the {\itshape \LaTeX\ User's Guide} --- 
+available from \url{https://www.acm.org/publications/proceedings-template}.
+
+The primary parameter given to the document class is
+the {\itshape template style} which corresponds to the kind of publication. This parameter is enclosed in square
+brackets and is a part of the {\verb|documentclass|} command:
+\begin{verbatim}
+  \documentclass[STYLE]{timtm}
+\end{verbatim}
+
+The styles relevant for a degree project report include:
+\begin{itemize}
+\item {\verb|sigcconf|}: The majority of ACM's conference proceedings use the {\verb|sigcconf|} template style, as will a degree project report for the Interactive Media Technology (TIMTM) and Media Management (TMMTM) programmes. However, as the class file has been optimized for these two programs, you do not have to give the option: {\verb|sigcconf|}. If you are going to submit to an ACM conference, then you should remove the KTH cover, title, page, DiVA information, Swedish abstract \& keywords, etc. and change to the sigconf document class.
+\item {\verb|screen|}: Produces colored hyperlinks.
+\item {\verb|review|}: Includes line numbers.
+\item {\verb|manuscript|}: Generally used in conjunction with \verb|review| to make it easy for a copy editor to work with your document.
+\end{itemize}
+
+A good second step in using the template is to modify the contents of the \texttt{custom\_configuration.tex} file. It contains a number of commands that configure the template as sell as provide meta data that will be needed when your degree project has been successfully completed and your grades are reported in LADOK and the degree project report is archived in DiVA. If you want to understand the motivation for this information and the underlying details of the template see the Overleaf project \url{https://www.overleaf.com/read/qxvttmmqbgdt}. The meta data is collected and appears on a page or pages and the end of the document. These pages will be removed before the report is archived in DiVA.
+
+\section{Modifications}
+
+Modifying the template --- including but not limited to: adjusting
+margins, typeface sizes, line spacing, paragraph and list definitions,
+and the use of the \verb|\vspace| command to manually adjust the
+vertical spacing between elements of your work --- is not allowed for actual ACM submissions\footnote{In the case of ACM submissions, your document will be returned to you for revision if modifications are discovered.} and are strongly discouraged for a degree project report --- let the template do lots of the work for you.
+
+\section{Typefaces}
+
+Degree project reports should use a Times Roman like font family, here we have used TeX Gyre. This is in contrast to the ``\verb|acmart|'' document class that requires the use of the ``Libertine'' typeface family.
+
+\section{Title Information}
+
+The title of your work should use capital letters appropriately -
+\url{https://capitalizemytitle.com/} has useful rules for
+capitalization. Use the {\verb|title|} command to define the title of
+your work. If your work has a subtitle, define it with the
+{\verb|subtitle|} command.  Do not insert line breaks in your title.
+
+If your title is lengthy, you must define a short version to be used
+in the page headers, to prevent overlapping text. The \verb|title|
+command has a ``short title'' parameter:
+\begin{verbatim}
+  \title[short title]{full title}
+\end{verbatim}
+
+There are \verb|alttitle| and \verb|altsubtitle| commands so that you can easily specify a Swedish title and optionally a Swedish subtitle for your report. Note that both the thesis title and the Swedish thesis title will subsequently be entered as meta data in DiVA and in LADOK.
+
+\section{Authors and Affiliations}
+
+Each author must be defined separately for accurate metadata
+identification. Multiple authors may share one affiliation. Authors'
+names should not be abbreviated; use full first names wherever
+possible. Include authors' e-mail addresses whenever possible. Note that grouping authors' names or e-mail addresses or e-mail
+addresses is unacceptable. \textbf{NB:} For a thesis, the author information is provided via the \texttt{custom\_configuration.tex} file.
+
+The \verb|authornote| and \verb|authornotemark| commands allow a note
+to apply to multiple authors --- for example, if the first two authors
+of an article contributed equally to the work. The ``\verb|acmart|'' document class'  documentation, available at
+\url{https://www.acm.org/publications/proceedings-template}, has a
+complete explanation of these commands and tips for their effective
+use. \textbf{NB:} For a thesis, these commands are probably irrelevant.
+
+\section{CCS Concepts and User-Defined Keywords}
+
+Two elements of the ``acmart'' document class provide powerful
+taxonomic tools for you to help readers find your work in an online
+search.
+
+The ACM Computing Classification System  (CCS) ---
+\url{https://www.acm.org/publications/class-2012} --- is a set of
+classifiers and concepts that describe the computing
+discipline. Authors can select entries from this classification
+system, via \url{https://dl.acm.org/ccs/ccs.cfm}, and generate the
+commands to be included in the \LaTeX\ source.
+
+User-defined keywords are a comma-separated list of words and phrases
+of the authors' choosing, providing a more flexible way of describing
+the research being presented.
+
+There is a \verb|SwedishKeywords| command to make it easy to add keywords in Swedish for your report. These can help make your report visible if someone searches for one or more of these Swedish keywords. You should order them in the same order that you entered the English keywords.
+
+For ACM submissions, CCS concepts and user-defined keywords are required for for all
+articles over two pages in length, and are optional for one- and
+two-page articles (or abstracts). For degree projects is is very desirable that you provide a suitable set of keywords to help potential readers find your thesis in DiVA.
+
+\section{Sectioning Commands}
+
+Your work should use standard \LaTeX\ sectioning commands:
+\verb|section|, \verb|subsection|, \verb|subsubsection|, and
+\verb|paragraph|. They should be numbered; do not remove the numbering
+from the commands.
+
+Simulating a sectioning command by setting the first word or words of
+a paragraph in boldface or italicized text is {\bfseries not allowed.}
+
+\section{Tables}
+
+The document class includes the ``\verb|booktabs|''
+package --- \url{https://ctan.org/pkg/booktabs} --- for preparing
+high-quality tables.
+
+Table captions are placed {\itshape above} the table.
+
+Because tables cannot be split across pages, the best placement for
+them is typically the top of the page nearest their initial cite.  To
+ensure this proper ``floating'' placement of tables, use the
+environment \textbf{table} to enclose the table's contents and the
+table caption.  The contents of the table itself must go in the
+\textbf{tabular} environment, to be aligned properly in rows and
+columns, with the desired horizontal and vertical rules.  Again,
+detailed instructions on \textbf{tabular} material are found in the
+\textit{\LaTeX\ User's Guide}.
+
+Immediately following this sentence is the point at which
+Table~\ref{tab:freq} is included in the input file; compare the
+placement of the table here with the table in the printed output of
+this document.
+
+\begin{table}
+  \caption{Frequency of Special Characters}
+  \label{tab:freq}
+  \begin{tabular}{ccl}
+    \toprule
+    Non-English or Math&Frequency&Comments\\
+    \midrule
+    \O & 1 in 1,000& For Danish, Faroese, and Norwegian names\\
+    $\pi$ & 1 in 5& Common in math\\
+    \$ & 4 in 5 & Used in business\\
+    $\Psi^2_1$ & 1 in 40,000& Unexplained usage\\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+To set a wider table, which takes up the whole width of the page's
+live area, use the environment \textbf{table*} to enclose the table's
+contents and the table caption.  As with a single-column table, this
+wide table will ``float'' to a location deemed more
+desirable. Immediately following this sentence is the point at which
+Table~\ref{tab:commands} is included in the input file; again, it is
+instructive to compare the placement of the table here with the table
+in the printed output of this document.
+
+\begin{table*}
+  \caption{Some Typical Commands}
+  \label{tab:commands}
+  \begin{tabular}{ccl}
+    \toprule
+    Command &A Number & Comments\\
+    \midrule
+    \texttt{{\char'134}author} & 100& Author \\
+    \texttt{{\char'134}table}& 300 & For tables\\
+    \texttt{{\char'134}table*}& 400& For wider tables\\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+Always use midrule to separate table header rows from data rows, and
+use it only for this purpose. This enables assistive technologies to
+recognise table headers and support their users in navigating tables
+more easily.
+
+\section{Math Equations}
+You may want to display math equations in three distinct styles:
+inline, numbered, or non-numbered display.  Each of the three are
+discussed in the next sections.
+
+\subsection{Inline (In-text) Equations}
+A formula that appears in the running text is called an inline or
+in-text formula.  It is produced by the \textbf{math} environment,
+which can be invoked with the usual
+\texttt{{\textbackslash}begin\,\ldots{\textbackslash}end} construction or with
+the short form \texttt{\$\,\ldots\$}. You can use any of the symbols
+and structures, from $\alpha$ to $\omega$, available in
+\LaTeX~\cite{Lamport:LaTeX}; this section will simply show a few
+examples of in-text equations in context. Notice how this equation:
+\begin{math}
+  \lim_{n\rightarrow \infty}x=0
+\end{math},
+set here in in-line math style, looks slightly different when
+set in display style.  (See next section).
+
+\subsection{Display Equations}
+A numbered display equation---one set off by vertical space from the
+text and centered horizontally---is produced by the \textbf{equation}
+environment. An unnumbered display equation is produced by the
+\textbf{displaymath} environment.
+
+Again, in either environment, you can use any of the symbols and
+structures available in \LaTeX\@; this section will just give a couple
+of examples of display equations in context.  First, consider the
+equation, shown as an inline equation above:
+\begin{equation}
+  \lim_{n\rightarrow \infty}x=0
+\end{equation}
+Notice how it is formatted somewhat differently in
+the \textbf{displaymath}
+environment.  Now, we'll enter an unnumbered equation:
+\begin{displaymath}
+  \sum_{i=0}^{\infty} x + 1
+\end{displaymath}
+and follow it with another numbered equation:
+\begin{equation}
+  \sum_{i=0}^{\infty}x_i=\int_{0}^{\pi+2} f
+\end{equation}
+just to demonstrate \LaTeX's able handling of numbering.
+
+\section{Figures}
+
+The ``\verb|figure|'' environment should be used for figures. One or
+more images can be placed within a figure. If your figure contains
+third-party material, you must clearly identify it as such, as shown
+in the example below.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\linewidth]{sample-franklin}
+  \caption{1907 Franklin Model D roadster. Photograph by Harris \&
+    Ewing, Inc. [Public domain], via Wikimedia
+    Commons. (\url{https://goo.gl/VLCRBB}).}
+  \Description{A woman and a girl in white dresses sit in an open car.}
+\end{figure}
+
+Your figures should contain a caption which describes the figure to
+the reader. These figure captions are placed {\itshape below} the figure.
+
+Every figure should also have a figure description unless it is purely
+decorative. These descriptions convey what is in the image to someone
+who cannot see it. These descriptions are used by search engine crawlers for
+indexing images. Additionally, the description is shown when images cannot be loaded.
+
+A figure description (entered using \texttt{{\textbackslash}Description}\{\}) must be \emph{unformatted} plain text less than 2000
+characters long (including spaces).  {\bfseries Figure descriptions
+  should not repeat the figure caption – their purpose is to capture
+  important information that is not already provided in the caption or
+  the main text of the paper.} For figures that convey important and
+complex new information, a short text description may not be
+adequate. More complex alternative descriptions can be placed in an
+appendix and referenced in a short figure description. For example,
+provide a data table capturing the information in a bar chart, or a
+structured list representing a graph.  For additional information
+regarding how best to write figure descriptions and why doing this is
+so important, please see
+\url{https://www.acm.org/publications/taps/describing-figures/}.
+
+\section{Citations and Bibliographies}
+
+The use of \BibTeX\ for the preparation and formatting of your
+references is strongly recommended. Authors' names should be complete
+--- use full first names (``Donald E. Knuth'') not initials
+(``D. E. Knuth'') --- and the salient identifying features of a
+reference should be included: title, year, volume, number, pages,
+article DOI, etc.
+
+The bibliography is included in your source document with these two
+commands, placed just before the \verb|\end{document}| command:
+\begin{verbatim}
+  \bibliographystyle{ACM-Reference-Format}
+  \bibliography{bibfile}
+\end{verbatim}
+where ``\verb|bibfile|'' is the name, without the ``\verb|.bib|''
+suffix, of the \BibTeX\ file.
+
+Citations and references are numbered by default.
+\begin{comment}
+A small number of
+ACM publications have citations and references formatted in the
+``author year'' style; for these exceptions, please include this
+command in the {\bfseries preamble} (before the command
+``\verb|\begin{document}|'') of your \LaTeX\ source:
+\begin{verbatim}
+  \citestyle{acmauthoryear}
+\end{verbatim}
+\end{comment}
+Some examples are:  A paginated journal article \cite{Abril07}, an
+  enumerated journal article \cite{Cohen07}, a reference to an entire
+  issue\,\cite{JCohen96}, a monograph (whole book) \cite{Kosiur01}, a
+  monograph/whole book in a series (see 2a in spec. document) \cite{Harel79}, a divisible-book such as an anthology or compilation
+  \cite{Editor00} followed by the same example, however we only output
+  the series if the volume number is given \cite{Editor00a} (so
+  Editor00a's series should NOT be present since it has no vol. no.),
+  a chapter in a divisible book \cite{Spector90}, a chapter in a
+  divisible book in a series \cite{Douglass98}, a multi-volume work as
+  book \cite{Knuth97}, a couple of articles in a proceedings (of a
+  conference, symposium, workshop for example) (paginated proceedings
+  article) \cite{Andler79, Hagerup1993}, a proceedings article with
+  all possible elements \cite{Smith10}, an example of an enumerated
+  proceedings article \cite{VanGundy07}, an informally published work
+  \cite{Harel78}, a couple of preprints \cite{Bornmann2019,
+    AnzarootPBM14}, a doctoral dissertation \cite{Clarkson85}, a
+  Master's thesis: \cite{anisi03}, an online document / world wide web
+  resource \cite{Thornburg01, Ablamowicz07, Poker06}, a video game
+  (Case 1) \cite{Obama08} and (Case 2) \cite{Novak03} and \cite{Lee05}
+  and (Case 3) a patent \cite{JoeScientist001}, work accepted for
+  publication \cite{rous08}, 'YYYYb'-test for prolific author
+  \cite{SaeediMEJ10} and \cite{SaeediJETC10}. Other cites might
+  contain 'duplicate' DOI and URLs (some SIAM articles)
+  \cite{Kirschmer:2010:AEI:1958016.1958018}. Boris / Barbara Beeton:
+  multi-volume works as books \cite{MR781536} and \cite{MR781537}. A
+  couple of citations with DOIs:
+  \cite{2004:ITE:1009386.1010128,Kirschmer:2010:AEI:1958016.1958018}. Online
+  citations: \cite{TUGInstmem, Thornburg01, CTANacmart}. Artifacts:
+  \cite{R} and \cite{UMassCitations}.
+
+\section{Quotations}
+Quotations may be italicized when \textit{``placed inline''}. While longer quotations can be placed in a \verb|quote| environment, as shown below:
+
+\begin{quote}
+Longer quotes, when placed in their own paragraph, need not be
+italicized or in quotation marks when indented.  
+\end{quote}
+
+\section{Language, Style, and Content}
+
+Spelling and
+punctuation may use any dialect of English (e.g., British, Canadian,
+US, etc.) provided this is done consistently. Hyphenation is
+optional. To ensure suitability for an international audience, please
+pay attention to the following:
+
+\begin{itemize}
+\item Write in a straightforward style.
+\item Try to avoid long or complex sentence structures.
+\item Use common and basic vocabulary (e.g., use the word ``unusual'' rather than the word ``arcane''.
+\item Briefly define or explain all technical terms that may be
+  unfamiliar to readers.
+\item Explain all acronyms the first time they are used in your
+  text---e.g., ``Digital Signal Processing (DSP)''. You might want to use the package \texttt{glossaries} to help with this.
+\item Explain local references (e.g., not everyone knows all city
+  names in a particular country).
+\item Explain ``insider'' comments. Ensure that your whole audience
+  understands any reference whose meaning you do not describe (e.g.,
+  do not assume that everyone has used a Macintosh or a particular
+  application).
+\item Explain colloquial language and puns. Understanding phrases like
+  ``red herring'' may require a local knowledge of English.  Humor and
+  irony are difficult to translate.
+\item Use unambiguous forms for culturally localized concepts, such as
+  times, dates, currencies, and numbers (e.g., ``1--5--97'' or
+  ``5/1/97'' may mean 5 January or 1 May, and ``seven o'clock'' may
+  mean 7:00 am or 19:00). For currencies, indicate equivalences:
+  ``Participants were paid {\fontfamily{txr}\selectfont \textwon}
+  25,000, or roughly US \$22.''
+\item Be careful with the use of gender-specific pronouns (he, she)
+  and other gendered words (chairman, manpower, man-months). Use
+  inclusive language that is gender-neutral (e.g., she or he, they,
+  s/he, chair, staff, staff-hours, person-years). See the
+  \textit{Guidelines for Bias-Free Writing} for further advice and
+  examples regarding gender and other personal
+  attributes~\cite{Schwartz:1995:GBF}. Be particularly aware of
+  considerations around writing about people with disabilities.  See also ACM Diversity and Inclusion Council's web page on ``Words Matter: Alternatives for Charged Terminology in the Computing Profession''~\cite{ACMdiversity}.
+\item If possible, use the full (extended) alphabetic character set
+  for names of persons, institutions, and places (e.g.,
+  Gr{\o}nb{\ae}k, Lafreni\'ere, S\'anchez, Nguy{\~{\^{e}}}n,
+  Universit{\"a}t, Wei{\ss}enbach, Z{\"u}llighoven, \r{A}rhus, etc.).
+  These characters are already included in most versions and variants
+  of Times, Helvetica, and Arial fonts.
+\end{itemize}
+
+\section{Accessibility}
+The Executive Council of SIGCHI has committed to making SIGCHI
+conferences more inclusive for researchers, practitioners, and
+educators with disabilities. As a part of this goal, all authors
+are asked to improve the accessibility of their
+submissions, specifically, to carry out the
+following five steps:
+\begin{enumerate}
+\item Add alternative text to all figures
+\item Mark table headings
+\item Add tags to the PDF
+\item Verify the default language
+\item Set the tab order to ``Use Document Structure''
+\end{enumerate}
+For more information and links to instructions and resources, please
+see: \url{http://chi2016.acm.org/accessibility}.  The
+\texttt{{\textbackslash}hyperref} package allows you to create well tagged PDF files,
+please see the preamble of this template for an example.
+
+\section{Producing and Testing PDF Files}
+
+We recommend that you produce a PDF version of your document t and then test your PDF file by viewing or printing it with Adobe Acrobat Reader Version 11 or Adobe Acrobat Reader DC. This software is
+widely available at no cost. Note that most
+readers will use a North American/European version of Acrobat
+reader, so please check your PDF accordingly.
+
+\section{Acknowledgments}
+
+Identification of funding sources and other support, and thanks to
+individuals and groups that assisted in the research and the
+preparation of the work should be included in an acknowledgment
+section, which is placed just before the reference section in your
+document.
+
+This section has a special environment:
+\begin{verbatim}
+  \begin{acks}
+  ...
+  \end{acks}
+\end{verbatim}
+so that the information contained therein can be more easily collected
+during the article metadata extraction phase, and to ensure
+consistency in the spelling of the section heading.
+
+Authors should \emph{not} prepare this section as a numbered or unnumbered {\verb|\section|}; please use the ``{\verb|acks|}'' environment.
+
+\section{Appendices}
+
+If your work needs an appendix, add it before the
+``\verb|\end{document}|'' command at the conclusion of your source
+document.
+
+Start the appendix with the ``\verb|appendix|'' command:
+\begin{verbatim}
+  \appendix
+\end{verbatim}
+and note that in the appendix, sections are lettered, not
+numbered. This document has two appendices, demonstrating the section
+and subsection identification method.
+
+%%
+%% The acknowledgments section is defined using the "acks" environment
+%% (and NOT an unnumbered section). This ensures the proper
+%% identification of the section in the article metadata, and the
+%% consistent spelling of the heading.
+\begin{acks}
+Thanks to all those who contributed to the \texttt{acmart} document class and earlier SIGCHI conference proceedings template.
+\end{acks}
+
+%%
+%% The next two lines define the bibliography style to be used, and
+%% the bibliography file.
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{sample-base}
+
+%%
+%% If your work has an appendix, this is the place to put it.
+\appendix
+
+\section{Research Methods}
+
+\subsection{Part One}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
+malesuada, quam in pulvinar varius, metus nunc fermentum urna, id
+sollicitudin purus odio sit amet enim. Aliquam ullamcorper eu ipsum
+vel mollis. Curabitur quis dictum nisl. Phasellus vel semper risus, et
+lacinia dolor. Integer ultricies commodo sem nec semper.
+
+\subsection{Part Two}
+
+Etiam commodo feugiat nisl pulvinar pellentesque. Etiam auctor sodales
+ligula, non varius nibh pulvinar semper. Suspendisse nec lectus non
+ipsum convallis congue hendrerit vitae sapien. Donec at laoreet
+eros. Vivamus non purus placerat, scelerisque diam eu, cursus
+ante. Etiam aliquam tortor auctor efficitur mattis.
+
+\section{Online Resources}
+
+Nam id fermentum dui. Suspendisse sagittis tortor a nulla mollis, in
+pulvinar ex pretium. Sed interdum orci quis metus euismod, et sagittis
+enim maximus. Vestibulum gravida massa ut felis suscipit
+congue. Quisque mattis elit a risus ultrices commodo venenatis eget
+dui. Etiam sagittis eleifend elementum.
+
+Nam interdum magna at lectus dignissim, ac dignissim lorem
+rhoncus. Maecenas eu arcu ac neque placerat aliquam. Nunc pulvinar
+massa et mattis lacinia.
+
+%% The following label is necessary for computing the last page number of the body of the report to include in the "For DIVA" information
+\label{pg:lastPageofMainmatter}
+
+\cleardoublepage
+\clearpage\thispagestyle{empty}\mbox{} % empty page with backcover on the other side
+\kthbackcover
+\fancyhead{}  % Do not use header on this extra page or pages
+\section*{\texteuro\texteuro\texteuro\texteuro\@ For DIVA \texteuro\texteuro\texteuro\texteuro}
+\lstset{numbers=none} %% remove any list line numbering
+\divainfo{pg:lastPageofMainmatter}
+
+
+\end{document}
+\endinput
+%%
+%% End of file `sample-degree-report.tex'.

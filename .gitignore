@@ -7,13 +7,18 @@ __pycache__/
 Data/
 Articles/
 Materials/
-Thesis drafts/
 *.xlsx
 *.xls
 *.xlsm
 *.docx
 *.pdf
 *.zip
+
+# Keep the thesis draft materials in git even though document/PDF/zip files are
+# ignored elsewhere.
+!Thesis drafts/
+!Thesis drafts/**
+Thesis drafts/**/~$*
 
 Results/models/
 Results/processed_data/
