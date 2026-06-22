@@ -1,0 +1,225 @@
+Individual plan for the degree project
+
+PROJECT INFORMATION
+
+Preliminary title:
+Anomaly Detection in District Heating Substations Using Reconstruction-Based Models
+
+Student:
+Mihailo Cvetkovic
+mihailoc@ug.kth.se
+
+Examiner at KTH:
+TO BE FILLED
+
+Supervisor at KTH:
+TO BE FILLED
+
+External supervisor / assignment provider:
+TO BE FILLED, if applicable
+
+Current date:
+22 June 2026
+
+Keywords:
+District heating, anomaly detection, time-series analysis, autoencoder, reconstruction error, clustering, unsupervised learning, energy efficiency
+
+
+BACKGROUND AND OBJECTIVE
+
+District heating systems distribute heat from centralized or shared heat-generation infrastructure to multiple buildings. They are important for energy efficiency, integration of renewable or recovered heat, and reduction of local emissions compared with many separate building-level heating systems. Modern district heating operation depends on reliable monitoring of temperatures, flow, power, and other operational variables. Faults or abnormal operating regimes can reduce efficiency, increase return temperatures, waste pumping energy, and make it harder to control the network.
+
+The degree project is carried out in the area of data-driven monitoring of district-heating substations. The available data consists of historical operational measurements from several heating-consumer sheets/buildings. The project also prepares the method for later testing on live data that is expected to be collected over one to two months. A practical challenge is that the historical data does not contain a complete set of confirmed fault labels. This makes the problem different from a standard supervised classification task. Instead of training a model on examples of known faults, the project must identify unusual operating windows and then support interpretation together with the supervisor/domain expert.
+
+The assignment provider's interest is to understand whether historical substation data can be used to identify abnormal operation in a useful and explainable way. The desired outcome is not only a black-box anomaly score, but a workflow that can answer practical questions such as: when did an unusual window occur, which feature was mainly responsible, and whether the anomaly agrees with simple engineering indicators such as low temperature difference.
+
+The high-level objective is to develop, test, and document an unsupervised anomaly-detection pipeline for district-heating substation data. The main model is a reconstruction-based autoencoder that learns typical 24-hour behavior from historical windows of supply temperature, return temperature, and flow. Windows with unusually high reconstruction error are treated as anomaly candidates. The project also investigates thresholding, dominant-feature attribution, engineering baselines, and clustering-based interpretation.
+
+The background knowledge required includes district-heating operation, heat-transfer relationships, time-series preprocessing, unsupervised learning, autoencoders, anomaly-detection evaluation, and basic scientific reporting.
+
+
+RESEARCH QUESTION AND METHOD
+
+Research question:
+How can reconstruction-based unsupervised learning be used to detect and interpret anomalous operating windows in district-heating substations when complete fault labels are not available?
+
+Hypothesis:
+A compact autoencoder trained on historical 24-hour operating windows can learn regular substation behavior. Windows that are poorly reconstructed by the model can be treated as anomaly candidates. By decomposing reconstruction error by feature, these candidates can be interpreted as primarily supply-temperature, return-temperature, or flow-related anomalies. Engineering baselines and clustering can then be used as supporting tools for domain review.
+
+Objectives:
+1. Prepare historical district-heating measurements into consistent time-series windows suitable for model training and evaluation.
+2. Train per-building reconstruction-based anomaly detectors using supply temperature, return temperature, and flow.
+3. Define an anomaly threshold that can be explained and compared across buildings, with current emphasis on the 3-sigma rule over the earlier 99th percentile threshold.
+4. Attribute each detected anomaly to a dominant feature so the result is easier to interpret.
+5. Compare autoencoder anomalies with simple engineering references, especially low delta-T periods.
+6. Use clustering as a secondary interpretation tool for operating regimes and anomaly families.
+7. Produce tables and figures that allow qualitative review with the supervisor/domain expert.
+8. Prepare the method for later application to live data.
+
+Tasks and challenges:
+1. Data inventory and cleaning.
+   Challenge: the source workbook contains multiple sheets with different data quality, missing values, zero values, and periods that may be difficult to interpret.
+
+2. Feature construction and windowing.
+   Challenge: the model requires consistent 24-hour windows, so irregular sampling and gaps must be handled carefully. The channels must also be scaled so that one feature does not dominate only because of its numerical range.
+
+3. Engineering baseline design.
+   Challenge: low delta-T is physically interpretable, but it does not cover every possible abnormal pattern. It should therefore be used as a reference, not as the only definition of anomaly.
+
+4. Autoencoder model training.
+   Challenge: there are no complete fault labels, so model selection cannot rely on ordinary supervised metrics. The architecture must be simple enough to explain and robust enough for the available data.
+
+5. Threshold selection.
+   Challenge: different thresholding rules can lead to different anomaly counts. The 3-sigma rule is easier to explain statistically, but it still depends on the shape of the training reconstruction-error distribution.
+
+6. Anomaly interpretation.
+   Challenge: a single reconstruction score does not explain what is wrong. The project therefore computes feature-level reconstruction errors and assigns each anomaly a dominant feature.
+
+7. Clustering analysis.
+   Challenge: clustering should not be confused with the main detector. In this project it is used to organize operating regimes and anomaly groups after the reconstruction-based detector has produced anomaly candidates.
+
+8. Evaluation and supervisor review.
+   Challenge: without complete labels, the project must combine quantitative summaries with qualitative/domain interpretation.
+
+Method:
+The method begins with data preprocessing. Each usable heating-consumer sheet is cleaned and resampled into 24-hour windows. The main model input consists of three channels: supply temperature, return temperature, and flow. Each retained window therefore represents one day of operation.
+
+The core model is a 1D convolutional autoencoder. The encoder compresses each multivariate 24-hour window into a lower-dimensional representation. The decoder reconstructs the original window from this compressed representation. During training, the model minimizes the reconstruction error between the input and the reconstructed output. If a later window has a high reconstruction error, this suggests that its shape or feature relationships differ from the historical patterns learned by the model.
+
+The anomaly score is based on mean squared reconstruction error. The current main threshold is based on a 3-sigma rule computed from the training-error distribution. This is compared with the earlier 99th percentile rule to understand how threshold choice changes anomaly counts across sheets.
+
+For interpretability, reconstruction error is also calculated separately for each feature. The feature with the largest contribution is reported as the dominant anomaly feature. This gives each flagged window a practical interpretation such as supply-dominant, return-dominant, or flow-dominant. This directly addresses the need for results that show not only that an anomaly occurred, but where it occurred in the measured variables.
+
+The method also includes two supporting analyses. First, a low delta-T baseline is calculated as an engineering reference. It is not an input to the autoencoder, but it helps check whether some model anomalies correspond to a known type of inefficient operation. Second, clustering is used to summarize operating regimes and anomaly families. Operating-regime clustering groups all retained windows by similar behavior, while anomaly-only clustering groups only the flagged windows after anomaly detection.
+
+Ethics and sustainability:
+The project is relevant to sustainability because district-heating efficiency is connected to energy use, heat losses, return temperatures, and the ability to integrate lower-temperature and renewable heat sources. Better monitoring can support earlier detection of inefficient operation and reduce unnecessary energy use. The ethical risks are limited because the data concerns building-level technical operation rather than personal behavior. However, the work should still avoid exposing sensitive operational data, building identifiers, or unpublished supervisor/company material unnecessarily. The method should also be presented as decision support rather than an automatic fault judgement, because false positives and false negatives are possible without complete labels.
+
+Limitations:
+The project is limited to the available historical sheets and the later live-data period provided by the supervisor. The work does not build a full production deployment, alarm interface, or control strategy. It also does not claim supervised fault-classification performance because confirmed labels are incomplete. The thesis focuses on anomaly candidate detection and interpretation rather than definitive fault diagnosis.
+
+Risks:
+1. Missing or inconsistent data may reduce the number of usable windows.
+   Mitigation: document filtering criteria and report retained-window counts.
+
+2. Lack of labels may make validation difficult.
+   Mitigation: combine reconstruction statistics, engineering baselines, dominant-feature attribution, and supervisor review.
+
+3. Threshold choice may strongly affect anomaly counts.
+   Mitigation: compare 3-sigma and 99th percentile thresholds and report sensitivity.
+
+4. Live data may cover too short a period to contain clear faults.
+   Mitigation: use live data as a deployment-style test of the pipeline and compare with available operational interpretation.
+
+5. Model results may be hard to explain.
+   Mitigation: emphasize feature-level reconstruction errors, top-window plots, tables, and domain-review summaries.
+
+
+EVALUATION AND NEWS VALUE
+
+Evaluation:
+The objectives are fulfilled if the project produces a complete and reproducible pipeline that can process the available sheets, train anomaly detectors, flag anomaly windows, attribute anomalies to dominant features, and summarize the results for supervisor/domain review.
+
+Quantitative evaluation will include:
+1. number of retained windows per building,
+2. anomaly counts and anomaly rates,
+3. training reconstruction-error distributions,
+4. comparison between 3-sigma and 99th percentile thresholds,
+5. dominant-feature counts for anomaly windows,
+6. overlap between autoencoder anomalies and low delta-T baseline windows,
+7. cluster-level anomaly summaries,
+8. comparison across buildings.
+
+Qualitative evaluation will include:
+1. visual inspection of top anomaly windows,
+2. interpretation of supply, return, and flow behavior,
+3. supervisor review of whether detected windows look operationally meaningful,
+4. discussion of which anomaly types are likely useful for live monitoring.
+
+Expected scientific results:
+The expected result is an applied study of unsupervised anomaly detection under realistic data limitations. The scientific contribution is not a new neural-network architecture, but an evaluated adaptation of reconstruction-based time-series anomaly detection to a small district-heating dataset with limited labels. The work also contributes by showing how dominant-feature attribution and engineering baselines can make unsupervised anomaly detection more interpretable for domain experts.
+
+Innovation/news value:
+The work is useful for readers interested in practical anomaly detection for energy systems where labels are scarce. It is also relevant for district-heating operators or researchers who need methods that can work before a large labelled fault database exists. The finished thesis should be interesting because it connects machine learning, building energy data, district-heating operation, and practical interpretability.
+
+
+PRE-STUDY
+
+The literature study will focus on four areas:
+1. district heating and the role of efficient substation operation,
+2. anomaly detection and the difference between supervised, semi-supervised, and unsupervised settings,
+3. deep learning and autoencoder-based time-series anomaly detection,
+4. clustering and representation learning for fault detection in district-heating substations, especially the HEAT paper.
+
+The HEAT paper is used as a methodological reference because it combines encoder-based representation learning and clustering for fault detection in district-heating substations. The current thesis adapts this direction to a smaller network with longer historical coverage and limited labels. Therefore, the main detection method is per-building reconstruction error, while clustering is used mainly for interpretation.
+
+Preliminary references are listed at the end of this plan. Additional references will be added during thesis writing, especially for district-heating efficiency, low-temperature networks, unsupervised anomaly detection, and autoencoder methods.
+
+
+CONDITIONS AND SCHEDULE
+
+Resources:
+1. Historical district-heating measurement files provided for the project.
+2. Later live-data export covering approximately one to two months.
+3. Python environment for data processing, modelling, and plotting.
+4. GitHub repository for code, generated result assets, and draft materials.
+5. Supervisor/domain review for interpreting anomaly candidates.
+6. KTH thesis template and reporting guidelines.
+
+Supervisor involvement:
+The supervisor will be involved through regular meetings, review of results, interpretation of anomaly figures/tables, feedback on method choices, and review of the thesis draft. The supervisor's domain knowledge is especially important because complete fault labels are not available.
+
+Project timeline:
+
+Phase 1: Project framing and pre-study
+Tasks: define problem, read district-heating and anomaly-detection literature, identify HEAT paper as main methodological reference.
+Milestone: research question and initial method direction.
+
+Phase 2: Data inventory and preprocessing
+Tasks: inspect workbook sheets, identify useful channels, clean timestamps and missing values, create 24-hour windows.
+Milestone: retained-window summary and usable-sheet selection.
+
+Phase 3: Engineering baselines
+Tasks: implement low delta-T checks and other simple data-quality summaries.
+Milestone: baseline results for comparison with machine-learning anomalies.
+
+Phase 4: Autoencoder model
+Tasks: train 1D convolutional autoencoders per building, compute reconstruction errors, compare thresholding methods.
+Milestone: anomaly score tables and reconstruction-error figures.
+
+Phase 5: Interpretability and clustering
+Tasks: compute feature-level reconstruction errors, assign dominant anomaly features, run operating-regime and anomaly-only clustering.
+Milestone: supervisor-review tables and interpretation figures.
+
+Phase 6: Thesis draft
+Tasks: write introduction, background, methodology, results, discussion, and future work.
+Milestone: complete draft shared with supervisor.
+
+Phase 7: Live-data testing and final revision
+Tasks: apply the pipeline to new live data, compare results with supervisor interpretation, revise thesis based on feedback.
+Milestone: final thesis submission.
+
+
+SELF-REFLECTION
+
+I have the programming and data-analysis background needed to implement the pipeline in Python and to work iteratively with real time-series data. The main technical challenge is not only training a model, but making the results understandable and defensible in the absence of complete labels. I will address this by keeping the model architecture explainable, documenting preprocessing choices, comparing against engineering baselines, and preparing figures/tables that support supervisor interpretation.
+
+The project also requires learning more about district-heating operation. I can complete this by combining literature study with supervisor feedback, especially when interpreting whether specific anomaly windows are operationally meaningful. I should be careful not to overstate the model's results as confirmed faults. The thesis should instead present the outputs as anomaly candidates and explain the evidence supporting their interpretation.
+
+
+USE OF GENERATIVE AI
+
+Generative AI was used as a discussion and drafting partner for this individual plan. It helped structure the text according to the template, improve formulation of research questions and objectives, and check that required sections were covered. The project direction, data, supervisor feedback, and final responsibility for the text remain my own. Generative AI was not used as a source of empirical results.
+
+
+REFERENCES
+
+Chandola, V., Banerjee, A., and Kumar, V. Anomaly Detection: A Survey. ACM Computing Surveys, 41(3), Article 15, 2009.
+
+Lund, H., Werner, S., Wiltshire, R., Svendsen, S., Thorsen, J. E., Hvelplund, F., and Mathiesen, B. V. 4th Generation District Heating (4GDH): Integrating smart thermal grids into future sustainable energy systems. Energy, 68, 1-11, 2014.
+
+Pang, G., Shen, C., Cao, L., and van den Hengel, A. Deep Learning for Anomaly Detection: A Review. ACM Computing Surveys, 54(2), Article 38, 2021.
+
+Campos, G. O., Zimek, A., Sander, J., Campello, R. J. G. B., Micenkova, B., Schubert, E., Assent, I., and Houle, M. E. On the Evaluation of Unsupervised Outlier Detection: Measures, Datasets, and an Empirical Study. Data Mining and Knowledge Discovery, 30, 891-927, 2016.
+
+HEAT: Hierarchical-constrained Encoder-Assisted Time series clustering for fault detection in district heating substations. Full bibliographic details to be completed from the final paper record before submission.
