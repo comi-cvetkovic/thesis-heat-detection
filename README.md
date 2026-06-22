@@ -129,23 +129,9 @@ Clustering is not the main detector. It is used to organize and interpret patter
 |-- Data/                 Raw/private data, ignored by git
 |-- Articles/             Papers and PDFs, ignored by git
 |-- Materials/            Local notes/material, ignored by git
-|-- Thesis drafts/        Word drafts and templates, ignored by git
 |-- requirements.txt
 `-- README.md
 ```
-
-## Why `Thesis drafts/` Is Not on GitHub
-
-`Thesis drafts/` is intentionally ignored in `.gitignore`.
-
-Reasons:
-
-- Word files and exported PDFs are binary and can become large quickly.
-- Drafts often contain supervisor comments, personal metadata, or unpublished writing.
-- Versioning `.docx` files in git is usually not useful because diffs are unreadable.
-- The thesis draft is being shared through the supervisor's shared folder instead.
-
-The repository tracks the code and generated result assets needed to reproduce or explain the work. The written thesis draft itself should remain in the shared OneDrive/supervisor folder unless there is a specific reason to publish a PDF later.
 
 ## Main Scripts
 
@@ -234,28 +220,67 @@ Purpose:
 
 ## Important Result Files
 
-Useful tables:
+The most complete current summary is:
 
 ```text
 Results/tables/supervisor_update_2026-06-07.md
+```
+
+Earlier supervisor notes are also kept because they document how the method changed:
+
+```text
+Results/tables/supervisor_update_2026-05-11.md
+Results/tables/supervisor_update_2026-05-25.md
+Results/tables/supervisor_update_2026-05-30.md
+Results/tables/supervisor_update_2026-06-07.md
+```
+
+Useful tables:
+
+```text
 Results/tables/supervisor_results_sheet_2026-06-07.csv
 Results/tables/threshold_method_comparison_2026-06-07.csv
 Results/tables/anomaly_feature_type_sheet_summary_stabilized_log.csv
 Results/tables/cluster_sheet_summary_stabilized_log.csv
 ```
 
-Useful figures:
+Useful figures include:
 
-```text
-Results/figures/thesis_selected7_anomaly_summary.png
-Results/figures/thesis_selected7_feature_type_by_sheet.png
-Results/figures/thesis_selected7_baseline_vs_autoencoder.png
-Results/figures/thesis_selected7_window_cluster_distribution.png
-Results/figures/threshold_distribution_by_sheet_2026-06-07.png
-Results/figures/per_sheet_anomaly_feature_heatmaps_2026-06-07.png
-Results/figures/reconstruction_overlay_cons_abat_garriga_stabilized_log_top01.png
-Results/figures/reconstruction_overlay_cons_hostatgeria_underfloor_hea_stabilized_log_top01.png
-```
+### Cross-building anomaly summary
+
+This figure compares the number and share of detected anomaly windows across the seven heating-consumer sheets.
+
+![Cross-building anomaly summary](Results/figures/thesis_selected7_anomaly_summary.png)
+
+### Dominant anomaly feature by sheet
+
+This figure shows whether flagged windows are mainly supply-temperature, return-temperature, or flow-related.
+
+![Dominant anomaly feature by sheet](Results/figures/thesis_selected7_feature_type_by_sheet.png)
+
+### Autoencoder anomalies versus low delta-T baseline
+
+This figure compares reconstruction-based anomalies with a simple engineering reference based on low supply-return temperature difference.
+
+![Autoencoder versus low delta-T baseline](Results/figures/thesis_selected7_baseline_vs_autoencoder.png)
+
+### Threshold comparison
+
+This figure shows reconstruction-error distributions and the thresholding behavior used when comparing the old p99 threshold with the 3-sigma threshold.
+
+![Threshold distribution by sheet](Results/figures/threshold_distribution_by_sheet_2026-06-07.png)
+
+### Per-sheet anomaly feature heatmaps
+
+This figure summarizes where each building's anomaly windows are concentrated by dominant feature and anomaly type.
+
+![Per-sheet anomaly feature heatmaps](Results/figures/per_sheet_anomaly_feature_heatmaps_2026-06-07.png)
+
+### Joint versus per-feature autoencoder comparison
+
+This figure compares the joint three-feature autoencoder with per-feature anomaly lenses for one building.
+
+![Joint versus per-feature autoencoder comparison](Results/figures/autoencoder_joint_vs_univariate_cons_hostatgeria_underfloor_hea_stabilized_log.png)
 
 ## Local Setup
 
