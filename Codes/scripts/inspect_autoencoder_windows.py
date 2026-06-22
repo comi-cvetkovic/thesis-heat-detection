@@ -35,9 +35,15 @@ DISPLAY_LABELS = {
     "supply_temp_c": "Supply [deg C]",
     "return_temp_c": "Return [deg C]",
     "derived_flow_kg_s": "Flow [kg/s]",
-    "stabilized_flow_log_feature": "Stabilized flow [a.u.]",
+    "stabilized_flow_log_feature": "Flow channel [-]",
     "delta_t_c": "Delta-T [deg C]",
 }
+
+
+def display_series(series: pd.Series) -> pd.Series:
+    """Return a plotting-only version of a window series without visual gaps."""
+    numeric = pd.to_numeric(series, errors="coerce")
+    return numeric.interpolate(method="time", limit_direction="both")
 
 
 def parse_args() -> argparse.Namespace:
@@ -93,6 +99,19 @@ def main() -> None:
         args.flow_clip_quantile,
     )
     flow_feature_name = feature_columns[-1]
+    display_flow_name = flow_feature_name
+    display_flow_frame = feature_frame
+    if args.flow_feature_mode == "stabilized_log":
+        raw_feature_frame, raw_feature_columns = load_feature_frame(
+            args.workbook,
+            args.sheet,
+            args.resample_interval,
+            "raw",
+            args.min_delta_t_c,
+            args.flow_clip_quantile,
+        )
+        display_flow_name = raw_feature_columns[-1]
+        display_flow_frame = raw_feature_frame
     baseline_frame = load_baseline_frame(args.workbook, args.sheet)
     baseline_frame = baseline_frame.set_index(TIMESTAMP_COL)
 
@@ -111,6 +130,9 @@ def main() -> None:
         start = row.window_start
         end = start + window_delta
         window_features = feature_frame.loc[(feature_frame.index >= start) & (feature_frame.index < end)]
+        window_display_flow = display_flow_frame.loc[
+            (display_flow_frame.index >= start) & (display_flow_frame.index < end), display_flow_name
+        ]
         window_baseline = baseline_frame.loc[(baseline_frame.index >= start) & (baseline_frame.index < end)]
         low_delta_count = int(window_baseline["is_low_delta_t_anomaly"].fillna(False).sum())
         inspection_rows.append(
@@ -139,14 +161,19 @@ def main() -> None:
             }
         )
 
+        plotted_supply = display_series(window_features["supply_temp_c"])
+        plotted_return = display_series(window_features["return_temp_c"])
+        plotted_flow = display_series(window_display_flow)
+        plotted_delta_t = display_series(window_baseline["delta_t_c"])
+
         fig, axes = plt.subplots(4, 1, figsize=(12, 9), sharex=True)
-        axes[0].plot(window_features.index, window_features["supply_temp_c"], linewidth=0.8)
+        axes[0].plot(window_features.index, plotted_supply, linewidth=0.8)
         axes[0].set_ylabel(DISPLAY_LABELS["supply_temp_c"])
-        axes[1].plot(window_features.index, window_features["return_temp_c"], linewidth=0.8, color="tab:green")
+        axes[1].plot(window_features.index, plotted_return, linewidth=0.8, color="tab:green")
         axes[1].set_ylabel(DISPLAY_LABELS["return_temp_c"])
-        axes[2].plot(window_features.index, window_features[flow_feature_name], linewidth=0.8, color="tab:purple")
-        axes[2].set_ylabel(DISPLAY_LABELS.get(flow_feature_name, flow_feature_name))
-        axes[3].plot(window_baseline.index, window_baseline["delta_t_c"], linewidth=0.8, color="tab:orange")
+        axes[2].plot(window_features.index, plotted_flow, linewidth=0.8, color="tab:purple")
+        axes[2].set_ylabel(DISPLAY_LABELS.get(display_flow_name, display_flow_name))
+        axes[3].plot(window_baseline.index, plotted_delta_t, linewidth=0.8, color="tab:orange")
         overlapping = window_baseline[window_baseline["is_low_delta_t_anomaly"].fillna(False)]
         if not overlapping.empty:
             axes[3].scatter(overlapping.index, overlapping["delta_t_c"], s=15, color="tab:red")

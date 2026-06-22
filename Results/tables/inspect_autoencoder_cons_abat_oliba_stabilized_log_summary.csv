@@ -1,3 +1,2 @@
 rank,window_start,window_end,split,reconstruction_mse,dominant_anomalous_feature,resampled_points,median_supply_temp_c,median_return_temp_c,median_stabilized_flow_log_feature,supply_temp_c_reconstruction_mse,return_temp_c_reconstruction_mse,stabilized_flow_log_feature_reconstruction_mse,median_delta_t_c,min_delta_t_c,low_delta_t_anomaly_points,has_low_delta_t_overlap
 1,2025-03-02 18:45:00,2025-03-03 18:45:00,train,0.38521242,return_temp_c,96,81.5400009,68.75,0.395471153109088,0.1859038,0.51031566,0.4594178,14.110000599999992,-4.699996999999996,0,False
-2,2024-09-23 06:45:00,2024-09-24 06:45:00,train,0.3816488,supply_temp_c,96,72.1800003,69.5299988,0.8397506547518208,0.4556369,0.25828862,0.43102095,0.5799999499999942,-1.9399986000000027,0,False

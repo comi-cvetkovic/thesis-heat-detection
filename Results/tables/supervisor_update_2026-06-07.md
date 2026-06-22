@@ -292,7 +292,127 @@ Current interpretation:
 - only a few are supply-dominant
 - the new scatter uses actual per-feature reconstruction errors on the axes, so the feature-type separation is visible without PCA
 
-## 8. Operating-regime clustering
+## 8. Additional interpretation figures
+
+These figures are not new methods. They are additional views on the same seven-sheet stabilized-flow result set, intended to make supervisor review easier.
+
+### 8.1 Threshold distributions by sheet
+
+This shows the training reconstruction-error distribution for each sheet, with both threshold rules overlaid.
+
+![Threshold distributions by sheet](../figures/threshold_distribution_by_sheet_2026-06-07.png)
+
+Use this to discuss:
+
+- why `p99` and `3-sigma` differ by sheet
+- whether the training-error tail looks heavy or skewed
+- whether the current threshold looks too strict or too loose
+
+### 8.2 Dominant anomaly feature over time
+
+This shows when flagged windows occur and what their dominant feature is.
+
+![Dominant feature over time by sheet](../figures/dominant_feature_over_time_by_sheet_2026-06-07.png)
+
+Use this to discuss:
+
+- whether anomaly type changes by season
+- whether some buildings have repeated periods of one anomaly type
+- whether flow-dominant anomalies cluster in time
+
+### 8.3 Top anomaly timeline by sheet
+
+This shows the top reviewed anomaly windows as a timeline.
+
+![Top anomaly timeline by sheet](../figures/top_anomaly_timeline_by_sheet_2026-06-07.png)
+
+Encoding:
+
+- color = dominant feature
+- point size = reconstruction error
+- red outline = low delta-T overlap
+
+Use this to discuss:
+
+- when the strongest reviewed anomalies occur
+- whether anomalies are isolated or repeated
+- whether low delta-T overlap is concentrated in one sheet or period
+
+### 8.4 Per-sheet reviewed anomaly feature heatmaps
+
+This gives a compact view of the top reviewed anomaly windows for each sheet.
+
+![Per-sheet anomaly feature heatmaps](../figures/per_sheet_anomaly_feature_heatmaps_2026-06-07.png)
+
+Columns:
+
+- supply error
+- return error
+- flow error
+- median delta-T
+- low delta-T baseline overlap
+
+Use this to discuss:
+
+- which feature really dominates inside each reviewed anomaly
+- whether high flow errors also come with very small delta-T
+- which reviewed windows are most physically interesting
+
+### 8.5 Raw vs stabilized flow flagged counts
+
+This is the clearest compact justification for keeping stabilized flow as the main method.
+
+![Raw vs stabilized flagged counts](../figures/raw_vs_stabilized_flagged_counts_2026-06-07.png)
+
+Use this to discuss:
+
+- how much stabilization changes anomaly volume
+- which sheets are most sensitive to raw-flow instability
+- whether the stabilized lens is materially changing the result set
+
+### 8.6 Train vs test anomaly split
+
+This separates anomalies found in the chronological training portion from those found later in the held-out test portion.
+
+![Train vs test anomaly split](../figures/train_vs_test_anomaly_split_2026-06-07.png)
+
+Use this to discuss:
+
+- whether the anomalies are mostly historical tail behavior
+- whether later periods also contain flagged windows
+- whether some sheets are more test-heavy than others
+
+### 8.7 Representative anomaly families
+
+This gives one representative example for each main anomaly family.
+
+![Representative anomaly families](../figures/representative_anomaly_families_2026-06-07.png)
+
+The current panel uses:
+
+- supply-dominant: underfloor heating
+- return-dominant: Abat Oliba
+- flow-dominant: Hostatgeria DHW radiators
+
+Use this to discuss:
+
+- whether the family labels are physically convincing
+- whether one family should become the main thesis narrative
+- whether some family looks more like a feature artifact than a true operational anomaly
+
+### 8.8 Low delta-T overlap summary
+
+This summarizes how often the reviewed anomalies also overlap the engineering low delta-T baseline.
+
+![Low delta-T overlap summary](../figures/low_delta_t_overlap_summary_2026-06-07.png)
+
+Use this to discuss:
+
+- which sheets agree with the simple engineering rule
+- which sheets show anomaly behavior beyond low delta-T
+- why underfloor heating remains the strongest case
+
+## 9. Operating-regime clustering
 
 The all-window clustering is still useful for showing operating regimes, but it is not the main anomaly-type view.
 
@@ -312,7 +432,7 @@ Current reading:
 
 But this is still regime interpretation, not direct supply / return / flow anomaly typing.
 
-## 9. Anomaly-only clustering
+## 10. Anomaly-only clustering
 
 The anomaly-only clustering is still available, but it should now be treated as a **secondary anomaly-family view**, not the main explanation layer.
 
@@ -353,7 +473,7 @@ Current result:
 
 This is useful, but the direct feature-type grouping in section 7 is easier to explain than PCA or mixed-cluster geometry.
 
-## 10. Detailed anomaly review table
+## 11. Detailed anomaly review table
 
 This is the main table for line-by-line supervisor interpretation:
 
@@ -379,7 +499,7 @@ What kind of anomaly does it seem to be?
 Should it be kept as a thesis example?
 ```
 
-## 11. Recommended interpretation
+## 12. Recommended interpretation
 
 Current strongest statements:
 
@@ -389,7 +509,7 @@ Current strongest statements:
 4. PCA is not needed for the main interpretation
 5. the dominant-feature view is the right primary anomaly-typing layer for the thesis writeup
 
-## 12. Immediate next writing angle
+## 13. Immediate next writing angle
 
 The thesis method chapter can now be framed as:
 
