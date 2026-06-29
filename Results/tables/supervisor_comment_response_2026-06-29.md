@@ -1,8 +1,12 @@
 # Supervisor comment response - 2026-06-29
 
-Revised file:
+Clean revised file:
 
-- `Thesis drafts/Thesis_Draft_29-06-2026_revised_method.docx`
+- `Thesis drafts/Thesis_Draft_29-06-2026_revised_method_v2.docx`
+
+Marked-up comparison file:
+
+- `Thesis drafts/Thesis_Draft_29-06-2026_revised_method_marked_changes.docx`
 
 Original reviewed file preserved:
 
@@ -28,7 +32,12 @@ Original reviewed file preserved:
    - dominant-feature attribution
 10. Added numbered equations for the 3-sigma threshold and anomaly decision rule.
 11. Added a numbered KMeans objective for the clustering section.
+12. Restored the flow relation to the mass-flow form:
+   - `m = P / (c_p (T_s - T_r))`
+13. Renumbered numerical references so citations appear in first-use order and the bibliography follows that order.
+14. Expanded the abstract again so it describes the method, evaluation approach, and main thesis outcome without naming individual buildings.
+15. Renamed "Related-work positioning" to "Related work".
 
 ## Message to supervisor
 
-The revised draft addresses the comments in the reviewed part of the document and expands the Method section with the requested mathematical formulation of the autoencoder model. The original commented file has been preserved, and the revised version is saved as `Thesis_Draft_29-06-2026_revised_method.docx`.
+The revised draft addresses the comments in the reviewed part of the document and expands the Method section with the requested mathematical formulation of the autoencoder model. The original commented file has been preserved, the clean revised version is saved as `Thesis_Draft_29-06-2026_revised_method_v2.docx`, and a marked-up version showing the main removed/added wording is saved as `Thesis_Draft_29-06-2026_revised_method_marked_changes.docx`.
