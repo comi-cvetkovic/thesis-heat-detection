@@ -8,6 +8,10 @@ Marked-up comparison file:
 
 - `Thesis drafts/Thesis_Draft_29-06-2026_revised_method_marked_changes.docx`
 
+Revised file with supervisor comments retained:
+
+- `Thesis drafts/Thesis_Draft_29-06-2026_revised_method_comments_retained.docx`
+
 Original reviewed file preserved:
 
 - `Thesis drafts/Thesis_Draft_22-06-2026_with_comments.docx`
@@ -40,4 +44,4 @@ Original reviewed file preserved:
 
 ## Message to supervisor
 
-The revised draft addresses the comments in the reviewed part of the document and expands the Method section with the requested mathematical formulation of the autoencoder model. The original commented file has been preserved, the clean revised version is saved as `Thesis_Draft_29-06-2026_revised_method_v2.docx`, and a marked-up version showing the main removed/added wording is saved as `Thesis_Draft_29-06-2026_revised_method_marked_changes.docx`.
+The revised draft addresses the comments in the reviewed part of the document and expands the Method section with the requested mathematical formulation of the autoencoder model. The original commented file has been preserved, the clean revised version is saved as `Thesis_Draft_29-06-2026_revised_method_v2.docx`, a marked-up version showing the main removed/added wording is saved as `Thesis_Draft_29-06-2026_revised_method_marked_changes.docx`, and a supervisor-review version with the original comments retained is saved as `Thesis_Draft_29-06-2026_revised_method_comments_retained.docx`.
